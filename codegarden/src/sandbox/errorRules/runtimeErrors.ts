@@ -7,6 +7,7 @@ const ATTR_RE = /AttributeError: '(\w+)' object has no attribute '(\w+)'/
 
 export function translateRuntimeError(
   error: string,
+  _code = '',
 ): FriendlyError | null {
   // IndexError
   if (INDEX_RE.test(error)) {

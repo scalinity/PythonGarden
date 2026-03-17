@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { useGameStore } from '@store/useGameStore.ts'
 import { AppShell } from '@components/AppShell/AppShell.tsx'
@@ -46,37 +46,37 @@ export function GameView() {
   const latestError = errors.length > 0 ? errors[errors.length - 1] : undefined
   const failedRuns = levelDefinition ? (hintsUsed[levelDefinition.id] ?? 0) : 0
 
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null)
-  const [showOverlay, setShowOverlay] = useState(false)
-  const prevStatusRef = useRef(status)
+  interface OverlayState {
+    visible: boolean
+    result: ValidationResult | null
+  }
+  const [overlay, setOverlay] = useState<OverlayState>({ visible: false, result: null })
+  const [prevStatus, setPrevStatus] = useState(status)
 
-  // Detect when execution finishes -> validate and show overlay
-  useEffect(() => {
-    const wasRunning = prevStatusRef.current === 'running' || prevStatusRef.current === 'stepping'
-    prevStatusRef.current = status
-
+  // Detect execution finish and validate
+  if (status !== prevStatus) {
+    setPrevStatus(status)
+    const wasRunning = prevStatus === 'running' || prevStatus === 'stepping'
     if (status === 'reviewing' && wasRunning && levelDefinition && worldState) {
       const result = validate(levelDefinition, worldState, actionQueue, code)
-      setValidationResult(result)
-      setShowOverlay(true)
+      setOverlay({ visible: true, result })
     }
-  }, [status, levelDefinition, worldState, actionQueue, code])
+  }
 
   const nextLevelId = levelDefinition ? getNextLevel(levelDefinition.id) : undefined
 
   const conditionResults = useMemo(() => {
-    if (!validationResult) return undefined
+    if (!overlay.result) return undefined
     const map: Record<number, boolean> = {}
-    validationResult.results.forEach((r, i) => { map[i] = r.passed })
+    overlay.result.results.forEach((r, i) => { map[i] = r.passed })
     return map
-  }, [validationResult])
+  }, [overlay.result])
 
   const handleReset = () => {
     clearExecution()
     resetWorld()
     resetCode()
-    setValidationResult(null)
-    setShowOverlay(false)
+    setOverlay({ visible: false, result: null })
   }
 
   if (!levelDefinition || !worldState) {
@@ -116,7 +116,7 @@ export function GameView() {
               <HintPanel
                 hints={levelDefinition.hints}
                 failedRuns={failedRuns}
-                onHintUsed={() => useHint(levelDefinition.id)}
+                onHintUsed={() => recordHint(levelDefinition.id)}
               />
             </div>
           </div>
@@ -156,16 +156,16 @@ export function GameView() {
         }
       />
 
-      {showOverlay && validationResult && (
+      {overlay.visible && overlay.result && (
         <SuccessOverlay
-          result={validationResult}
+          result={overlay.result}
           hasNextLevel={!!nextLevelId}
           onNextLevel={nextLevelId ? () => navigate(`/play/${nextLevelId}`) : undefined}
           onReplay={() => {
-            setShowOverlay(false)
+            setOverlay({ visible: false, result: null })
             handleReset()
           }}
-          onClose={() => setShowOverlay(false)}
+          onClose={() => setOverlay((o) => ({ ...o, visible: false }))}
         />
       )}
     </div>

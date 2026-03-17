@@ -5,7 +5,7 @@ import { translateTypeError } from './errorRules/typeErrors.ts'
 import { translateRuntimeError } from './errorRules/runtimeErrors.ts'
 import { translateLoopError } from './errorRules/loopErrors.ts'
 
-type ErrorRule = (error: string, code?: string) => FriendlyError | null
+type ErrorRule = (error: string, code: string) => FriendlyError | null
 
 const rules: ErrorRule[] = [
   translateNameError,
