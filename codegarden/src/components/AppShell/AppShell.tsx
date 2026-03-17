@@ -18,7 +18,7 @@ export function AppShell({
   debugOpen,
 }: AppShellProps) {
   return (
-    <div className="flex h-screen w-full flex-col overflow-hidden" style={{ background: 'var(--color-bg-primary)' }}>
+    <div className="flex h-full w-full flex-col overflow-hidden" style={{ background: 'var(--color-bg-primary)' }}>
       {/* Top: World View */}
       <div className="flex-none" style={{ height: '40%' }}>
         {worldView}
