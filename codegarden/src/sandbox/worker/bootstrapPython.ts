@@ -37,9 +37,7 @@ _SAFE_BUILTINS = {
     'sum':        sum,
     'abs':        abs,
     'round':      round,
-    'type':       type,
     'isinstance': isinstance,
-    'hasattr':    hasattr,
     'True':       True,
     'False':      False,
     'None':       None,
@@ -91,18 +89,27 @@ class _PlantStub:
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
         self.name = self._props.get('name', self._id)
 
+    @property
     def moisture(self):
         return self._props.get('moisture', 0)
 
+    @property
     def health(self):
         return self._props.get('health', 100)
 
+    @property
     def is_ripe(self):
         return self._props.get('ripe', False)
 
+    @property
+    def ripe(self):
+        return self._props.get('ripe', False)
+
+    @property
     def species(self):
         return self._props.get('species', 'unknown')
 
+    @property
     def needs_pollination(self):
         return self._props.get('needsPollination', False)
 
@@ -115,6 +122,10 @@ class _SprinklerStub:
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
+
+    @property
+    def isOn(self):
+        return self._props.get('isOn', False)
 
     def on(self):
         _enqueue('sprinkler_on', source=self._id, _line=_current_line())
@@ -161,8 +172,13 @@ class _ReservoirStub:
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
 
+    @property
     def level(self):
         return self._props.get('level', 0)
+
+    @property
+    def max_level(self):
+        return self._props.get('maxLevel', 100)
 
     def __repr__(self):
         return f"Reservoir({self._id!r})"
@@ -182,14 +198,20 @@ class _StorageStub:
         v = item._id if hasattr(item, '_id') else str(item)
         _enqueue('store_in_bin', source=self._id, target=bin_name, value=v, _line=_current_line())
 
+    def file(self, bin_name, item):
+        """Alias for store_in."""
+        v = str(item) if not hasattr(item, '_id') else item._id
+        _enqueue('store_in_bin', source=self._id, target=bin_name, value=v, _line=_current_line())
+
+    @property
     def items(self):
         return list(self._props.get('items', []))
 
     def count(self, item_type=None):
-        items = self._props.get('items', [])
+        items_list = self._props.get('items', [])
         if item_type is None:
-            return len(items)
-        return sum(1 for i in items if i == item_type)
+            return len(items_list)
+        return sum(1 for i in items_list if i == item_type)
 
     def __repr__(self):
         return f"Storage({self._id!r})"
@@ -200,9 +222,11 @@ class _WeatherStub:
     def __init__(self, descriptor):
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
 
+    @property
     def sunlight(self):
         return self._props.get('sunlight', 50)
 
+    @property
     def temperature(self):
         return self._props.get('temperature', 20)
 
@@ -215,6 +239,10 @@ class _CanopyStub:
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
+
+    @property
+    def isOpen(self):
+        return self._props.get('isOpen', False)
 
     def open(self):
         _enqueue('canopy_open', source=self._id, _line=_current_line())
@@ -232,8 +260,9 @@ class _PumpStub:
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
 
-    def transfer(self):
-        _enqueue('pump_transfer', source=self._id, _line=_current_line())
+    def transfer(self, target=None):
+        t = target._id if target is not None and hasattr(target, '_id') else None
+        _enqueue('pump_transfer', source=self._id, target=t, _line=_current_line())
 
     def __repr__(self):
         return f"Pump({self._id!r})"
@@ -375,6 +404,7 @@ def _build_safe_globals(descriptors_json):
 
     # Build stubs
     plant_stubs = []
+    all_stubs_by_type = {}  # type -> [stub, ...]
     for desc in descriptors:
         stub_cls = _STUB_MAP.get(desc['type'])
         if stub_cls is None:
@@ -383,15 +413,30 @@ def _build_safe_globals(descriptors_json):
             stub = stub_cls(desc)
             plant_stubs.append(stub)
             ns[desc['name']] = stub
+            all_stubs_by_type.setdefault('Plant', []).append(stub)
         elif desc['type'] == 'Greenhouse':
             pass  # handled below after all plants are built
         else:
-            ns[desc['name']] = stub_cls(desc)
+            stub = stub_cls(desc)
+            ns[desc['name']] = stub
+            all_stubs_by_type.setdefault(desc['type'], []).append(stub)
 
     # Build greenhouse stub if present
     for desc in descriptors:
         if desc['type'] == 'Greenhouse':
-            ns[desc['name']] = _GreenhouseStub(desc, plant_stubs)
+            gh = _GreenhouseStub(desc, plant_stubs)
+            ns[desc['name']] = gh
+            # Also expose row shortcuts (e.g., row_a = greenhouse.row("A"))
+            for row_name in desc.get('properties', []):
+                if row_name.get('name') == 'rows':
+                    for rn in row_name.get('value', []):
+                        var_name = f"row_{rn.lower()}"
+                        ns[var_name] = gh.row(rn)
+
+    # Expose collection lists for levels that need them
+    # e.g., "plants" = list of all plant stubs
+    if len(plant_stubs) > 1 and 'plants' not in ns:
+        ns['plants'] = list(plant_stubs)
 
     return ns
 

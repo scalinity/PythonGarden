@@ -12,14 +12,13 @@ export const level07: LevelDefinition = {
     '# Loop through each plant\nfor plant in row_a:\n    if plant.moisture < 30:\n        sprinkler.water(plant)\n',
   availableObjects: [
     {
-      name: 'row_a',
-      type: 'list',
+      name: 'greenhouse',
+      type: 'Greenhouse',
       methods: [
         {
-          name: 'length',
-          signature: 'len(row_a)',
-          description: 'Returns the number of plants in the row.',
-          returnType: 'number',
+          name: 'row',
+          signature: 'greenhouse.row("A")',
+          description: 'Returns the list of plants in the named row.',
         },
       ],
     },

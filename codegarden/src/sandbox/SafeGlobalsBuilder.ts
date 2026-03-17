@@ -127,12 +127,39 @@ const WORLD_KEY_TO_TYPE: Record<string, string> = {
   sprayers: 'Sprayer',
 }
 
+// Map collection-style available object names to world state keys
+const COLLECTION_NAME_MAP: Record<string, string> = {
+  plants: 'plants',
+  sprinklers: 'sprinklers',
+  drones: 'drones',
+  reservoirs: 'reservoirs',
+  storages: 'storages',
+  canopies: 'canopies',
+  pumps: 'pumps',
+  sprayers: 'sprayers',
+}
+
 export function buildGameObjectDescriptors(
   level: LevelDefinition,
   world: WorldState,
 ): GameObjectDescriptor[] {
   const allowedNames = new Set(level.availableObjects.map((o) => o.name))
   const descriptors: GameObjectDescriptor[] = []
+
+  // Check if any available object refers to a collection (e.g., "plants")
+  // If so, include ALL entities of that collection type
+  const includeAllOfType = new Set<string>()
+  for (const obj of level.availableObjects) {
+    const worldKey = COLLECTION_NAME_MAP[obj.name]
+    if (worldKey) {
+      const typeName = WORLD_KEY_TO_TYPE[worldKey]
+      if (typeName) includeAllOfType.add(typeName)
+    }
+    // Greenhouse needs all plants for row() filtering
+    if (obj.type === 'Greenhouse') {
+      includeAllOfType.add('Plant')
+    }
+  }
 
   // Add entity-backed objects
   for (const [key, typeName] of Object.entries(WORLD_KEY_TO_TYPE)) {
@@ -142,7 +169,8 @@ export function buildGameObjectDescriptors(
     for (const entity of entities) {
       const e = entity as unknown as Record<string, unknown>
       const name = (e.name as string | undefined) ?? (e.id as string)
-      if (!allowedNames.has(name)) continue
+      // Include if: name is explicitly allowed, OR the entire type collection is allowed
+      if (!allowedNames.has(name) && !includeAllOfType.has(typeName)) continue
 
       const methodDef = ENTITY_METHOD_MAP[typeName]
       descriptors.push({

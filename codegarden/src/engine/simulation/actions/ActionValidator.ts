@@ -39,32 +39,39 @@ export function validateAction(action: GameAction, world: WorldState): Validatio
     return { valid: false, reason: `Unknown action type: ${action.type}` }
   }
 
-  // Actions that need a target entity
-  const targetActions: ActionType[] = [
-    'water_plant', 'feed_plant', 'sprinkler_on', 'sprinkler_off',
-    'spray', 'canopy_open', 'canopy_close', 'store_item', 'store_in_bin',
+  // Self-targeting actions: entity ID is in source (the entity acts on itself)
+  const selfActions: ActionType[] = [
+    'sprinkler_on', 'sprinkler_off', 'spray',
+    'canopy_open', 'canopy_close',
+    'store_item', 'store_in_bin',
   ]
 
-  // Actions that need a source entity
-  const sourceActions: ActionType[] = [
-    'drone_move_to', 'drone_harvest', 'drone_pollinate', 'pump_transfer',
-  ]
-
-  if (targetActions.includes(action.type)) {
-    if (!action.target) {
-      return { valid: false, reason: `Action ${action.type} requires a target` }
-    }
-    if (!findEntity(world, entityType, action.target)) {
-      return { valid: false, reason: `Target entity '${action.target}' not found in ${entityType}` }
-    }
-  }
-
-  if (sourceActions.includes(action.type)) {
+  if (selfActions.includes(action.type)) {
     if (!action.source) {
-      return { valid: false, reason: `Action ${action.type} requires a source` }
+      return { valid: false, reason: `Action ${action.type} requires a source entity` }
     }
     if (!findEntity(world, entityType, action.source)) {
       return { valid: false, reason: `Source entity '${action.source}' not found in ${entityType}` }
+    }
+  }
+
+  // Actions targeting another entity: entity ID is in source, target is the other entity
+  if (action.type === 'water_plant' || action.type === 'feed_plant') {
+    if (!action.target) {
+      return { valid: false, reason: `Action ${action.type} requires a target plant` }
+    }
+    if (!findEntity(world, 'plants', action.target)) {
+      return { valid: false, reason: `Target plant '${action.target}' not found` }
+    }
+  }
+
+  // Drone actions need source drone
+  if (action.type === 'drone_move_to' || action.type === 'drone_harvest' || action.type === 'drone_pollinate') {
+    if (!action.source) {
+      return { valid: false, reason: `Action ${action.type} requires a source drone` }
+    }
+    if (!findEntity(world, 'drones', action.source)) {
+      return { valid: false, reason: `Source drone '${action.source}' not found` }
     }
   }
 
@@ -91,12 +98,15 @@ export function validateAction(action: GameAction, world: WorldState): Validatio
     }
   }
 
-  // pump_transfer needs a target reservoir
+  // pump_transfer needs a source pump; target reservoir is optional (falls back to first)
   if (action.type === 'pump_transfer') {
-    if (!action.target) {
-      return { valid: false, reason: 'pump_transfer requires a target reservoir' }
+    if (!action.source) {
+      return { valid: false, reason: 'pump_transfer requires a source pump' }
     }
-    if (!findEntity(world, 'reservoirs', action.target)) {
+    if (!findEntity(world, 'pumps', action.source)) {
+      return { valid: false, reason: `Source pump '${action.source}' not found` }
+    }
+    if (action.target && !findEntity(world, 'reservoirs', action.target)) {
       return { valid: false, reason: `Target reservoir '${action.target}' not found` }
     }
   }
