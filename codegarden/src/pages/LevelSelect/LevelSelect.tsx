@@ -70,10 +70,10 @@ export function LevelSelect() {
                   {String(level.order).padStart(2, '0')}
                 </span>
                 {completed && (
-                  <span style={{ color: 'var(--color-success)' }}>{'\u2713'}</span>
+                  <span style={{ color: 'var(--color-success)' }} aria-label="Completed">{'\u2713'}</span>
                 )}
                 {!unlocked && (
-                  <span style={{ color: 'var(--color-text-secondary)' }}>{'\uD83D\uDD12'}</span>
+                  <span style={{ color: 'var(--color-text-secondary)' }} aria-label="Locked">{'\uD83D\uDD12'}</span>
                 )}
               </div>
               <h3

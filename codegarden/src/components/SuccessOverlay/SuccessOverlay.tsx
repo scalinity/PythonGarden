@@ -1,3 +1,4 @@
+import { useEffect, useRef, useCallback } from 'react'
 import type { ValidationResult } from '@engine/validation/Validator.ts'
 
 interface SuccessOverlayProps {
@@ -15,6 +16,47 @@ export function SuccessOverlay({
   onClose,
   hasNextLevel,
 }: SuccessOverlayProps) {
+  const dialogRef = useRef<HTMLDivElement>(null)
+
+  // Focus trap: keep focus inside the dialog
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose()
+      return
+    }
+    if (e.key !== 'Tab') return
+    const dialog = dialogRef.current
+    if (!dialog) return
+    const focusable = dialog.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    if (focusable.length === 0) return
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }, [onClose])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    // Auto-focus the first button
+    const dialog = dialogRef.current
+    if (dialog) {
+      const first = dialog.querySelector<HTMLElement>('button')
+      first?.focus()
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
@@ -22,7 +64,7 @@ export function SuccessOverlay({
       aria-modal="true"
       aria-label={result.passed ? 'Level complete' : 'Level results'}
     >
-      <div className="w-full max-w-sm mx-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-panel)] shadow-2xl">
+      <div ref={dialogRef} className="w-full max-w-sm mx-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-panel)] shadow-2xl">
         <div className="px-5 py-4 text-center border-b border-[var(--color-border)]">
           <h2
             className={`text-2xl font-bold ${

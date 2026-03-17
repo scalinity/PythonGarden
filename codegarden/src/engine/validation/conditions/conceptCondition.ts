@@ -2,10 +2,7 @@ interface ConceptConditionParams {
   concept: string
 }
 
-export interface ConditionResult {
-  passed: boolean
-  description: string
-}
+import type { ConditionResult } from '../Validator.ts'
 
 const conceptPatterns: Record<string, RegExp> = {
   for_loop: /for\s+\w+\s+in\s+/,

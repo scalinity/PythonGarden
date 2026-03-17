@@ -9,10 +9,7 @@ interface StateConditionParams {
   contains?: string
 }
 
-export interface ConditionResult {
-  passed: boolean
-  description: string
-}
+import type { ConditionResult } from '../Validator.ts'
 
 function compare(actual: unknown, operator: string, expected: unknown): boolean {
   switch (operator) {

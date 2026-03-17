@@ -80,24 +80,27 @@ export function CodeEditor({
   }, [errors])
 
   return (
-    <Editor
-      height="100%"
-      language="python"
-      theme="vs-dark"
-      value={code}
-      onChange={(value) => onChange(value ?? '')}
-      onMount={handleMount}
-      options={{
-        fontSize,
-        minimap: { enabled: false },
-        lineNumbers: 'on',
-        wordWrap: 'on',
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
-        tabSize: 4,
-        renderLineHighlight: 'line',
-        padding: { top: 8 },
-      }}
-    />
+    <div className="h-full w-full" role="region" aria-label="Python code editor">
+      <Editor
+        height="100%"
+        language="python"
+        theme="vs-dark"
+        value={code}
+        onChange={(value) => onChange(value ?? '')}
+        onMount={handleMount}
+        options={{
+          fontSize,
+          minimap: { enabled: false },
+          lineNumbers: 'on',
+          wordWrap: 'on',
+          scrollBeyondLastLine: false,
+          automaticLayout: true,
+          tabSize: 4,
+          renderLineHighlight: 'line',
+          padding: { top: 8 },
+          ariaLabel: 'Python code editor',
+        }}
+      />
+    </div>
   )
 }

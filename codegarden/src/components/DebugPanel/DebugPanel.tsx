@@ -47,10 +47,14 @@ export function DebugPanel({ traceEntries, variables, actions, error }: DebugPan
   return (
     <div className="flex h-full flex-col" style={{ background: 'var(--color-bg-panel)' }}>
       {/* Tab bar */}
-      <div className="flex gap-1 border-b px-2 pt-1" style={{ borderColor: 'var(--color-border)' }}>
+      <div className="flex gap-1 border-b px-2 pt-1" style={{ borderColor: 'var(--color-border)' }} role="tablist" aria-label="Debug panel tabs">
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`tabpanel-${tab.id}`}
+            id={`tab-${tab.id}`}
             onClick={() => setActiveTab(tab.id)}
             className="rounded-t px-3 py-1 text-xs font-semibold transition-colors"
             style={{
@@ -69,6 +73,7 @@ export function DebugPanel({ traceEntries, variables, actions, error }: DebugPan
               <span
                 className="ml-1 inline-block h-2 w-2 rounded-full"
                 style={{ background: 'var(--color-error)' }}
+                aria-label="Has errors"
               />
             )}
           </button>
@@ -76,7 +81,7 @@ export function DebugPanel({ traceEntries, variables, actions, error }: DebugPan
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-y-auto p-2">
+      <div className="flex-1 overflow-y-auto p-2" role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
         {activeTab === 'variables' && (
           <table className="w-full text-xs">
             <thead>
