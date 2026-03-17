@@ -168,7 +168,7 @@ export function buildGameObjectDescriptors(
 
     for (const entity of entities) {
       const e = entity as unknown as Record<string, unknown>
-      const name = (e.name as string | undefined) ?? (e.id as string)
+      const name = e.id as string
       // Include if: name is explicitly allowed, OR the entire type collection is allowed
       if (!allowedNames.has(name) && !includeAllOfType.has(typeName)) continue
 

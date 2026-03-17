@@ -26,8 +26,17 @@ function buildSystemPrompt(): string {
 
   const level = levelDefinition
 
+  const availableObjectLines = (level.availableObjects ?? []).map(
+    (obj) => `  ${obj.name} (${obj.type}): ${obj.methods.map((m) => m.signature).join(', ')}`,
+  )
+
   let prompt = `You are an AI tutor embedded in CodeGarden, a Python learning game.
 Answer concisely. Guide understanding — don't give direct solutions.
+
+## CRITICAL DIAGNOSTIC RULES
+1. The variable names in "Available Objects" are the EXACT Python identifiers injected into the sandbox. If the player's code uses those names correctly and still gets a NameError, it is a GAME ENGINE BUG — not a typo. Tell them their code is correct and to report the issue.
+2. Only suggest a typo or wrong name if the player used a name that is NOT listed in Available Objects.
+3. Always check the player's code against the Available Objects list before suggesting any fix.
 
 ## Current Level: ${level.order}. "${level.title}"
 ## Mission
@@ -38,21 +47,25 @@ ${conceptCard.explanation}
 Example:
 ${conceptCard.pythonExample}
 
-## Available Objects
-${(level.availableObjects ?? []).map((obj) => `${obj.name} (${obj.type}): ${obj.methods.map((m) => m.signature).join(', ')}`).join('\n')}
+## Available Python Variables (these names are guaranteed to be in scope)
+${availableObjectLines.join('\n')}
 
 ## Success Conditions
 ${level.successConditions.map((c) => `- ${c.description}`).join('\n')}
 
-## Player's Code
+## Player's Current Code
 \`\`\`python
 ${code}
 \`\`\`
 
-## Status: ${status}`
+## Execution Status: ${status}`
 
   if (errors.length > 0) {
-    prompt += `\n\n## Errors\n${errors[0].headline}: ${errors[0].explanation}`
+    const err = errors[0]
+    prompt += `\n\n## Error\nHeadline: ${err.headline}\nDetail: ${err.explanation}`
+    if (err.rawError) {
+      prompt += `\nRaw Python error: ${err.rawError}`
+    }
   }
 
   if (logs.length > 0) {
