@@ -23,7 +23,7 @@ export function useExecutionController() {
   const setStatus = useGameStore((s) => s.setStatus)
   const setCurrentLine = useGameStore((s) => s.setCurrentLine)
   const addActions = useGameStore((s) => s.addActions)
-  const addTraceEntry = useGameStore((s) => s.addTraceEntry)
+  const addTraceEntryWithLine = useGameStore((s) => s.addTraceEntryWithLine)
   const setVariables = useGameStore((s) => s.setVariables)
   const addError = useGameStore((s) => s.addError)
   const addLog = useGameStore((s) => s.addLog)
@@ -41,8 +41,7 @@ export function useExecutionController() {
     simulation.current = sim
 
     pm.onTrace = (entry) => {
-      addTraceEntry(entry)
-      setCurrentLine(entry.line)
+      addTraceEntryWithLine(entry)
     }
     pm.onActions = (actions) => addActions(actions)
     pm.onLog = (msg) => addLog(msg)
@@ -53,6 +52,8 @@ export function useExecutionController() {
 
     pm.init().then(() => {
       ready.current = true
+    }).catch((err) => {
+      console.error('Pyodide init failed:', err)
     })
 
     return () => {

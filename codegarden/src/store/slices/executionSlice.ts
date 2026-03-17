@@ -19,6 +19,7 @@ export interface ExecutionSlice {
   setCurrentLine: (line: number | null) => void
   addActions: (actions: GameAction[]) => void
   addTraceEntry: (entry: TraceEntry) => void
+  addTraceEntryWithLine: (entry: TraceEntry) => void
   setVariables: (vars: VariableSnapshot[]) => void
   addError: (error: FriendlyError) => void
   addLog: (message: string) => void
@@ -64,7 +65,17 @@ export const createExecutionSlice: StateCreator<
 
   addTraceEntry: (entry) =>
     set((state) => {
-      state.traceEntries.push(entry)
+      if (state.traceEntries.length < 5000) {
+        state.traceEntries.push(entry)
+      }
+    }),
+
+  addTraceEntryWithLine: (entry) =>
+    set((state) => {
+      if (state.traceEntries.length < 5000) {
+        state.traceEntries.push(entry)
+      }
+      state.currentLine = entry.line
     }),
 
   setVariables: (vars) =>

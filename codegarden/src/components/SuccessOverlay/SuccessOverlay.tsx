@@ -89,7 +89,7 @@ export function SuccessOverlay({
                   }`}
                 aria-hidden="true"
               >
-                {cond.passed ? 'Y' : 'N'}
+                {cond.passed ? '\u2713' : '\u2717'}
               </span>
               <span className="text-[var(--color-text-primary)]">{cond.description}</span>
             </div>
