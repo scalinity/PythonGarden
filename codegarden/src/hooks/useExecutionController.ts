@@ -77,8 +77,11 @@ export function useExecutionController() {
     if (!pyodide.current || !simulation.current || !levelDefinition || !worldState) return
     if (!ready.current) return
 
+    // Capture code at run time to avoid stale closure in onComplete
+    const executedCode = code
+
     // Pre-execution security scan
-    const scan = scanCode(code)
+    const scan = scanCode(executedCode)
     if (!scan.safe) {
       addError({
         headline: 'Blocked code',
@@ -124,7 +127,7 @@ export function useExecutionController() {
           setVariables(result.variables)
 
           if (!result.error) {
-            const validation = validate(levelDefinition, finalWorld, result.actions, code)
+            const validation = validate(levelDefinition, finalWorld, result.actions, executedCode)
             setValidationResult(validation)
             if (validation.passed) {
               const next = getNextLevel(levelDefinition.id)
@@ -145,9 +148,9 @@ export function useExecutionController() {
 
     ctrl.setSpeed(speed)
     controller.current = ctrl
-    saveCode(levelDefinition.id, code)
+    saveCode(levelDefinition.id, executedCode)
 
-    await ctrl.run(code)
+    await ctrl.run(executedCode)
   }, [
     levelDefinition, worldState, code, speed,
     clearExecution, setStatus, updateWorldState, addError,

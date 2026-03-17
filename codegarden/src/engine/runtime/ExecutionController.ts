@@ -32,6 +32,7 @@ export class ExecutionController {
   private eventLog = new EventLog()
   private actionQueue: GameAction[] = []
   private drainTimer: ReturnType<typeof setTimeout> | null = null
+  private drainResolve: (() => void) | null = null
   private timeoutTimer: ReturnType<typeof setTimeout> | null = null
   private stepIndex = 0
   private cancelled = false
@@ -174,7 +175,11 @@ export class ExecutionController {
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => {
-      this.drainTimer = setTimeout(resolve, ms)
+      this.drainResolve = resolve
+      this.drainTimer = setTimeout(() => {
+        this.drainResolve = null
+        resolve()
+      }, ms)
     })
   }
 
@@ -187,6 +192,10 @@ export class ExecutionController {
     if (this.drainTimer) {
       clearTimeout(this.drainTimer)
       this.drainTimer = null
+    }
+    if (this.drainResolve) {
+      this.drainResolve()
+      this.drainResolve = null
     }
     this.clearTimeout()
   }

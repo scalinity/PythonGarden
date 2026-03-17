@@ -18,6 +18,7 @@ const ACTION_ICONS: Record<string, string> = {
   spray: '\uD83D\uDCA8',
   drone_move_to: '\u2708',
   drone_harvest: '\uD83C\uDF3E',
+  drone_pollinate: '\uD83C\uDF3C',
   pump_transfer: '\u2699',
   canopy_open: '\u2600',
   canopy_close: '\uD83C\uDF19',

@@ -198,5 +198,6 @@ export class PyodideManager {
     this.executeReject = null
 
     this.spawnWorker()
+    void this.init()
   }
 }

@@ -12,6 +12,12 @@ import sys as _sys
 import json as _json
 import inspect as _inspect
 import time as _time
+import re as _re
+import keyword as _keyword
+
+# Extract what we need from inspect, then remove module reference
+_currentframe = _inspect.currentframe
+del _inspect
 
 # ---- Safe builtins allow-list ------------------------------------------------
 _SAFE_BUILTINS = {
@@ -49,6 +55,9 @@ _trace_entries = []
 _log_messages = []
 _instruction_count = 0
 _INSTRUCTION_BUDGET = 50000
+_MAX_ACTIONS = 500
+_MAX_TRACE_ENTRIES = 5000
+_MAX_LOG_MESSAGES = 200
 _step_mode = False
 _interrupt_view = None          # Int32Array view set by worker
 
@@ -65,7 +74,7 @@ class ExecutionCancelled(Exception):
 export const BOOTSTRAP_STUBS = `
 def _current_line():
     """Return the line number of the caller's caller in user code."""
-    frame = _inspect.currentframe()
+    frame = _currentframe()
     try:
         caller = frame.f_back.f_back  # skip _current_line -> method -> user code
         return caller.f_lineno if caller else 0
@@ -74,6 +83,8 @@ def _current_line():
 
 
 def _enqueue(action_type, **kwargs):
+    if len(_action_queue) >= _MAX_ACTIONS:
+        return
     _action_queue.append({
         'type': action_type,
         'sourceLine': kwargs.pop('_line', _current_line()),
@@ -84,6 +95,7 @@ def _enqueue(action_type, **kwargs):
 
 # ---- Plant stub --------------------------------------------------------------
 class _PlantStub:
+    __slots__ = ('_id', '_props', 'name')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -119,6 +131,7 @@ class _PlantStub:
 
 # ---- Sprinkler stub ----------------------------------------------------------
 class _SprinklerStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -146,6 +159,7 @@ class _SprinklerStub:
 
 # ---- Drone stub ---------------------------------------------------------------
 class _DroneStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -168,6 +182,7 @@ class _DroneStub:
 
 # ---- Reservoir stub -----------------------------------------------------------
 class _ReservoirStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -186,6 +201,7 @@ class _ReservoirStub:
 
 # ---- Storage stub -------------------------------------------------------------
 class _StorageStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -219,6 +235,7 @@ class _StorageStub:
 
 # ---- Weather stub -------------------------------------------------------------
 class _WeatherStub:
+    __slots__ = ('_props',)
     def __init__(self, descriptor):
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
 
@@ -236,6 +253,7 @@ class _WeatherStub:
 
 # ---- Canopy stub --------------------------------------------------------------
 class _CanopyStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -256,6 +274,7 @@ class _CanopyStub:
 
 # ---- Pump stub ----------------------------------------------------------------
 class _PumpStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -270,6 +289,7 @@ class _PumpStub:
 
 # ---- Sprayer stub -------------------------------------------------------------
 class _SprayerStub:
+    __slots__ = ('_id', '_props')
     def __init__(self, descriptor):
         self._id = descriptor['id']
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
@@ -284,6 +304,7 @@ class _SprayerStub:
 
 # ---- Greenhouse stub ----------------------------------------------------------
 class _GreenhouseStub:
+    __slots__ = ('_props', '_plants')
     def __init__(self, descriptor, all_plants):
         self._props = {p['name']: p['value'] for p in descriptor['properties']}
         self._plants = all_plants  # list of _PlantStub
@@ -350,11 +371,12 @@ def _make_trace_fn(interrupt_view, step_mode_flag):
                     except Exception:
                         pass
 
-            _trace_entries.append({
-                'line': frame.f_lineno,
-                'variables': local_vars,
-                'timestamp': _time.time(),
-            })
+            if len(_trace_entries) < _MAX_TRACE_ENTRIES:
+                _trace_entries.append({
+                    'line': frame.f_lineno,
+                    'variables': local_vars,
+                    'timestamp': _time.time(),
+                })
 
             # Step mode: pause and wait for continue signal (index 1)
             if step_mode_flag and interrupt_view is not None:
@@ -380,20 +402,32 @@ def _make_trace_fn(interrupt_view, step_mode_flag):
 // 4. Build safe globals and execute user code
 // ---------------------------------------------------------------------------
 export const BOOTSTRAP_EXECUTE = `
+def _is_safe_name(name):
+    """Check that a descriptor name is a safe Python identifier."""
+    return (
+        _re.match(r'^[a-zA-Z][a-zA-Z0-9_]*$', name) is not None
+        and not name.startswith('_')
+        and not _keyword.iskeyword(name)
+    )
+
+
 def _build_safe_globals(descriptors_json):
     """Build a restricted namespace from game object descriptors."""
     descriptors = _json.loads(descriptors_json)
     ns = dict(_SAFE_BUILTINS)
+    ns['__builtins__'] = {}
 
     # Override print to capture logs
     def _safe_print(*args, sep=' ', end='\\n'):
         msg = sep.join(str(a) for a in args) + end
-        _log_messages.append(msg.rstrip('\\n'))
+        if len(_log_messages) < _MAX_LOG_MESSAGES:
+            _log_messages.append(msg.rstrip('\\n'))
     ns['print'] = _safe_print
 
     # Add log and highlight helpers
     def _log(message):
-        _log_messages.append(str(message))
+        if len(_log_messages) < _MAX_LOG_MESSAGES:
+            _log_messages.append(str(message))
         _enqueue('log', value=str(message), _line=_current_line())
     ns['log'] = _log
 
@@ -409,16 +443,19 @@ def _build_safe_globals(descriptors_json):
         stub_cls = _STUB_MAP.get(desc['type'])
         if stub_cls is None:
             continue
+        name = desc['name']
+        if not _is_safe_name(name):
+            continue
         if desc['type'] == 'Plant':
             stub = stub_cls(desc)
             plant_stubs.append(stub)
-            ns[desc['name']] = stub
+            ns[name] = stub
             all_stubs_by_type.setdefault('Plant', []).append(stub)
         elif desc['type'] == 'Greenhouse':
             pass  # handled below after all plants are built
         else:
             stub = stub_cls(desc)
-            ns[desc['name']] = stub
+            ns[name] = stub
             all_stubs_by_type.setdefault(desc['type'], []).append(stub)
 
     # Build greenhouse stub if present
