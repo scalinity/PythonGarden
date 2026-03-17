@@ -1,4 +1,4 @@
-import Editor, { type OnMount } from '@monaco-editor/react'
+import Editor, { useMonaco, type OnMount } from '@monaco-editor/react'
 import { useRef, useEffect } from 'react'
 import type { editor } from 'monaco-editor'
 
@@ -19,6 +19,7 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
+  const monaco = useMonaco()
 
   const handleMount: OnMount = (editorInstance) => {
     editorRef.current = editorInstance
@@ -55,11 +56,9 @@ export function CodeEditor({
   // Show error markers
   useEffect(() => {
     const ed = editorRef.current
-    if (!ed) return
+    if (!ed || !monaco) return
     const model = ed.getModel()
     if (!model) return
-    const monaco = (window as unknown as { monaco: typeof import('monaco-editor') }).monaco
-    if (!monaco) return
 
     if (errors && errors.length > 0) {
       monaco.editor.setModelMarkers(
@@ -77,7 +76,7 @@ export function CodeEditor({
     } else {
       monaco.editor.setModelMarkers(model, 'codegarden', [])
     }
-  }, [errors])
+  }, [errors, monaco])
 
   return (
     <div className="h-full w-full" role="region" aria-label="Python code editor">

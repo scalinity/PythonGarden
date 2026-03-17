@@ -93,12 +93,14 @@ function drawPump(g: Graphics, _p: Pump, x: number, y: number) {
 export function WorldView({ worldState, activeLine }: WorldViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const appRef = useRef<Application | null>(null)
+  const appReady = useRef(false)
 
   useEffect(() => {
     if (!containerRef.current) return
 
     const app = new Application()
     appRef.current = app
+    appReady.current = false
     let destroyed = false
 
     const init = async () => {
@@ -112,12 +114,14 @@ export function WorldView({ worldState, activeLine }: WorldViewProps) {
         return
       }
       containerRef.current!.appendChild(app.canvas as HTMLCanvasElement)
+      appReady.current = true
     }
 
     init()
 
     return () => {
       destroyed = true
+      appReady.current = false
       if (appRef.current) {
         appRef.current.destroy(true)
         appRef.current = null
@@ -127,7 +131,7 @@ export function WorldView({ worldState, activeLine }: WorldViewProps) {
 
   useEffect(() => {
     const app = appRef.current
-    if (!app || !app.stage) return
+    if (!app || !app.stage || !appReady.current) return
 
     // Clear previous — destroy children to free GPU textures
     for (const child of app.stage.children) {

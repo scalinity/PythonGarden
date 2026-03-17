@@ -5,6 +5,12 @@ import type { WorldState } from '@/types/entities.ts'
 const clamp = (v: number, min: number, max: number) =>
   Math.max(min, Math.min(max, v))
 
+const DEFAULT_WATER_AMOUNT = 20
+const WATER_HEALTH_BONUS = 5
+const DEFAULT_SPRAY_AMOUNT = 15
+const SPRAY_RANGE = 2
+const DEFAULT_FEED_AMOUNT = 10
+
 function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
 }
@@ -15,8 +21,8 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
       case 'water_plant': {
         const plant = draft.plants.find((p) => p.id === action.target)
         if (plant) {
-          plant.moisture = clamp(plant.moisture + (action.amount ?? 20), 0, 100)
-          plant.health = clamp(plant.health + 5, 0, 100)
+          plant.moisture = clamp(plant.moisture + (action.amount ?? DEFAULT_WATER_AMOUNT), 0, 100)
+          plant.health = clamp(plant.health + WATER_HEALTH_BONUS, 0, 100)
         }
         break
       }
@@ -37,8 +43,8 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
         const sprinkler = draft.sprinklers.find((s) => s.id === action.source)
         if (sprinkler) {
           for (const plant of draft.plants) {
-            if (distance(sprinkler.position, plant.position) <= 2) {
-              plant.moisture = clamp(plant.moisture + (action.amount ?? 15), 0, 100)
+            if (distance(sprinkler.position, plant.position) <= SPRAY_RANGE) {
+              plant.moisture = clamp(plant.moisture + (action.amount ?? DEFAULT_SPRAY_AMOUNT), 0, 100)
             }
           }
         }
@@ -106,7 +112,7 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
       case 'feed_plant': {
         const plant = draft.plants.find((p) => p.id === action.target)
         if (plant) {
-          plant.health = clamp(plant.health + (action.amount ?? 10), 0, 100)
+          plant.health = clamp(plant.health + (action.amount ?? DEFAULT_FEED_AMOUNT), 0, 100)
         }
         break
       }
