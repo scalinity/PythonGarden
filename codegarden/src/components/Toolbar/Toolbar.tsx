@@ -72,7 +72,7 @@ export function Toolbar({
       {/* Step */}
       <button
         onClick={onStep}
-        disabled={status === 'running'}
+        disabled={status !== 'step_paused'}
         aria-label="Step through code one action at a time"
         title="Step"
         className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
