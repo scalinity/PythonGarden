@@ -60,7 +60,7 @@ export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
   const conceptCard = concepts.find((c) => c.id === level.conceptCardId)
 
   return (
-    <div className="flex h-full flex-col gap-3 p-3" style={{ background: 'var(--color-bg-panel)' }}>
+    <div className="flex h-full flex-col gap-4 p-4" style={{ background: 'var(--color-bg-panel)' }}>
       {/* Header */}
       <div>
         <div className="text-xs uppercase tracking-wide" style={{ color: 'var(--color-accent-dim)' }}>
@@ -73,7 +73,7 @@ export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
 
       {/* Mission */}
       <div>
-        <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="mb-1 text-[11px] font-medium uppercase" style={{ color: 'var(--color-text-secondary)', letterSpacing: '0.1em' }}>
           Mission
         </h3>
         <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
@@ -101,7 +101,7 @@ export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
 
       {/* Available objects */}
       <div>
-        <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="mb-1 text-[11px] font-medium uppercase" style={{ color: 'var(--color-text-secondary)', letterSpacing: '0.1em' }}>
           Objects
         </h3>
         {level.availableObjects.map((obj) => (
@@ -111,7 +111,7 @@ export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
 
       {/* Success criteria */}
       <div>
-        <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--color-text-secondary)' }}>
+        <h3 className="mb-1 text-[11px] font-medium uppercase" style={{ color: 'var(--color-text-secondary)', letterSpacing: '0.1em' }}>
           Goals
         </h3>
         {level.successConditions.map((cond, i) => (

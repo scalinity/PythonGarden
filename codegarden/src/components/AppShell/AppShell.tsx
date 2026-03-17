@@ -44,7 +44,7 @@ export function AppShell({
           style={{ borderTop: '1px solid var(--color-border)' }}
         >
           {toolbar}
-          <div className="min-h-0 flex-1">{editor}</div>
+          <div className="min-h-0 flex-1" style={{ background: '#161616' }}>{editor}</div>
         </div>
       </div>
 

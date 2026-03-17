@@ -45,7 +45,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           monaco: ['monaco-editor', '@monaco-editor/react'],
-          pixi: ['pixi.js'],
+          three: ['three'],
           pyodide: ['pyodide'],
         },
       },

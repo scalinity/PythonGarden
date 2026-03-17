@@ -64,7 +64,7 @@ export function SuccessOverlay({
       aria-modal="true"
       aria-label={result.passed ? 'Level complete' : 'Level results'}
     >
-      <div ref={dialogRef} className="w-full max-w-sm mx-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-panel)] shadow-2xl">
+      <div ref={dialogRef} className="w-full max-w-sm mx-4 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-panel)] shadow-lg">
         <div className="px-5 py-4 text-center border-b border-[var(--color-border)]">
           <h2
             className={`text-2xl font-bold ${
@@ -102,7 +102,7 @@ export function SuccessOverlay({
               onClick={onNextLevel}
               className="flex-1 px-3 py-2 text-sm font-semibold rounded
                          bg-[var(--color-success)] text-[var(--color-bg-primary)]
-                         hover:brightness-110 transition-all cursor-pointer"
+                         hover:opacity-90 transition-all cursor-pointer"
             >
               Next Level
             </button>
