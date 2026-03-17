@@ -129,7 +129,10 @@ export function WorldView({ worldState, activeLine }: WorldViewProps) {
     const app = appRef.current
     if (!app || !app.stage) return
 
-    // Clear previous
+    // Clear previous — destroy children to free GPU textures
+    for (const child of app.stage.children) {
+      child.destroy({ children: true })
+    }
     app.stage.removeChildren()
 
     const scene = new Container()
@@ -156,8 +159,6 @@ export function WorldView({ worldState, activeLine }: WorldViewProps) {
     const toX = (gx: number) => PADDING + gx * CELL
     const toY = (gy: number) => PADDING + gy * CELL
 
-    const hasActive = activeLine !== undefined && activeLine >= 0
-
     // Sprinklers
     for (const s of worldState.sprinklers ?? []) {
       drawSprinkler(g, s, toX(s.position.x), toY(s.position.y))
@@ -167,9 +168,10 @@ export function WorldView({ worldState, activeLine }: WorldViewProps) {
       scene.addChild(label)
     }
 
-    // Plants
+    // Plants — highlight only when there's an active line (execution in progress)
+    const highlightPlants = activeLine !== undefined && activeLine > 0
     for (const p of worldState.plants ?? []) {
-      drawPlant(g, p, toX(p.position.x), toY(p.position.y), hasActive)
+      drawPlant(g, p, toX(p.position.x), toY(p.position.y), highlightPlants)
       const label = new Text({ text: p.name || p.id, style: { fontSize: 10, fill: 0x94a3b8 } })
       label.x = toX(p.position.x) - label.width / 2
       label.y = toY(p.position.y) - 28

@@ -4,10 +4,7 @@ interface ResourceConditionParams {
   maxActions?: number
 }
 
-export interface ConditionResult {
-  passed: boolean
-  description: string
-}
+import type { ConditionResult } from '../Validator.ts'
 
 export function checkResourceCondition(
   params: ResourceConditionParams,

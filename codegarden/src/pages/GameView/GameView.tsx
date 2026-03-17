@@ -100,6 +100,7 @@ export function GameView() {
             <MissionPanel level={levelDefinition} conditionResults={conditionResults} />
             <div className="px-3 pb-3">
               <HintPanel
+                key={levelDefinition.id}
                 hints={levelDefinition.hints}
                 failedRuns={failedRuns}
                 onHintUsed={() => recordHint(levelDefinition.id)}

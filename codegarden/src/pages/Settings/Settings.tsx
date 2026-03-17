@@ -96,6 +96,8 @@ export function Settings() {
           </span>
           <button
             onClick={() => setReducedMotion(!reducedMotion)}
+            role="switch"
+            aria-checked={reducedMotion}
             className="rounded px-4 py-1 text-sm"
             style={{
               background: reducedMotion
@@ -118,6 +120,8 @@ export function Settings() {
           </span>
           <button
             onClick={() => setDyslexiaFont(!dyslexiaFont)}
+            role="switch"
+            aria-checked={dyslexiaFont}
             className="rounded px-4 py-1 text-sm"
             style={{
               background: dyslexiaFont

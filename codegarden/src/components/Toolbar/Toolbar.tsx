@@ -58,6 +58,8 @@ export function Toolbar({
       <button
         onClick={onRun}
         disabled={isRunning}
+        aria-label="Run code"
+        title="Run code"
         className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
         style={{
           background: 'var(--color-success)',
@@ -71,6 +73,8 @@ export function Toolbar({
       <button
         onClick={onStep}
         disabled={status === 'running'}
+        aria-label="Step through code one action at a time"
+        title="Step"
         className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
         style={{
           background: 'var(--color-accent)',
@@ -84,6 +88,8 @@ export function Toolbar({
       <button
         onClick={onStop}
         disabled={isIdle}
+        aria-label="Stop execution"
+        title="Stop"
         className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
         style={{
           background: 'var(--color-error)',
@@ -96,6 +102,8 @@ export function Toolbar({
       {/* Reset */}
       <button
         onClick={onReset}
+        aria-label="Reset code and world state"
+        title="Reset"
         className="rounded px-3 py-1 text-xs font-bold"
         style={{
           background: 'var(--color-bg-panel)',
@@ -110,7 +118,7 @@ export function Toolbar({
       <div className="mx-1 h-4 w-px" style={{ background: 'var(--color-border)' }} />
 
       {/* Speed selector */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1" role="group" aria-label="Execution speed">
         <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
           Speed:
         </span>
@@ -118,6 +126,8 @@ export function Toolbar({
           <button
             key={s}
             onClick={() => onSpeedChange(s)}
+            aria-label={`Speed ${s}x`}
+            aria-pressed={speed === s}
             className="rounded px-2 py-0.5 text-xs font-mono transition-colors"
             style={{
               background: speed === s ? 'var(--color-accent-dim)' : 'transparent',
@@ -136,6 +146,8 @@ export function Toolbar({
       {/* Debug toggle */}
       <button
         onClick={onToggleDebug}
+        aria-label={debugOpen ? 'Hide debug panel' : 'Show debug panel'}
+        aria-pressed={debugOpen}
         className="rounded px-2 py-0.5 text-xs transition-colors"
         style={{
           background: debugOpen ? 'var(--color-accent-dim)' : 'transparent',
@@ -146,10 +158,11 @@ export function Toolbar({
       </button>
 
       {/* Status */}
-      <div className="ml-auto flex items-center gap-1.5">
+      <div className="ml-auto flex items-center gap-1.5" role="status" aria-live="polite">
         <span
           className="inline-block h-2 w-2 rounded-full"
           style={{ background: STATUS_COLORS[status] }}
+          aria-hidden="true"
         />
         <span className="text-xs" style={{ color: STATUS_COLORS[status] }}>
           {STATUS_LABELS[status]}

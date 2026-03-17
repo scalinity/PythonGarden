@@ -38,7 +38,7 @@ function ConditionRow({
 }) {
   return (
     <div className="flex items-center gap-2 py-0.5 text-xs">
-      <span>
+      <span aria-label={passed === undefined ? 'Not yet checked' : passed ? 'Passed' : 'Failed'}>
         {passed === undefined ? '?' : passed ? '\u2713' : '\u2717'}
       </span>
       <span
