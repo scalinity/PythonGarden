@@ -29,6 +29,7 @@ export default defineConfig({
     },
   },
   server: {
+    open: !process.env.ELECTRON,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
