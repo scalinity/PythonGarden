@@ -92,3 +92,8 @@ body {
 
 /* Monaco line decoration classes */
 .line-highlight-active { background: rgba(245, 158, 11, 0.12) !important; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}

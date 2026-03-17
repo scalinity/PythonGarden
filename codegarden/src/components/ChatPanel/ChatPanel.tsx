@@ -64,8 +64,8 @@ function UserBubble({ message }: { message: ChatMessage }) {
       className="ml-auto"
       style={{
         maxWidth: '85%',
-        background: 'rgba(245, 158, 11, 0.08)',
-        border: '1px solid rgba(245, 158, 11, 0.2)',
+        background: 'color-mix(in srgb, var(--color-accent) 8%, transparent)',
+        border: '1px solid color-mix(in srgb, var(--color-accent) 20%, transparent)',
         borderRadius: '6px',
         padding: '8px 10px',
         fontSize: '0.8rem',
@@ -156,15 +156,6 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
         background: 'var(--color-bg-panel)',
       }}
     >
-      {/* Blink animation */}
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <style {...{ precedence: 'low' } as any}>{`
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-      `}</style>
-
       {/* Header */}
       <div
         className="flex items-center justify-between px-3 py-2"
@@ -207,6 +198,9 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       {/* Message list */}
       <div
         className="flex flex-col gap-3 p-3"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat history"
         style={{
           flex: '1 1 0',
           overflowY: 'auto',
