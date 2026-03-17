@@ -9,6 +9,7 @@ import { DebugPanel } from '@components/DebugPanel/DebugPanel.tsx'
 import { Toolbar } from '@components/Toolbar/Toolbar.tsx'
 import { HintPanel } from '@components/HintPanel/HintPanel.tsx'
 import { SuccessOverlay } from '@components/SuccessOverlay/SuccessOverlay.tsx'
+import { ChatPanel } from '@components/ChatPanel/ChatPanel.tsx'
 import { useLevelLoader } from '@hooks/useLevelLoader.ts'
 import { useExecutionController } from '@hooks/useExecutionController.ts'
 import { useAccessibility } from '@hooks/useAccessibility.ts'
@@ -35,6 +36,7 @@ export function GameView() {
   const variables = useGameStore((s) => s.variables)
   const errors = useGameStore((s) => s.errors)
   const debugPanelOpen = useGameStore((s) => s.debugPanelOpen)
+  const chatPanelOpen = useGameStore((s) => s.chatPanelOpen)
   const togglePanel = useGameStore((s) => s.togglePanel)
   const hintsUsed = useGameStore((s) => s.hintsUsed)
   const recordHint = useGameStore((s) => s.useHint)
@@ -86,74 +88,81 @@ export function GameView() {
   }
 
   return (
-    <div className="relative">
-      <AppShell
-        debugOpen={debugPanelOpen}
-        worldView={
-          <WorldView
-            worldState={worldState}
-            activeLine={currentLine ?? undefined}
-          />
-        }
-        missionPanel={
-          <div className="flex flex-col gap-3">
-            <MissionPanel level={levelDefinition} conditionResults={conditionResults} />
-            <div className="px-3 pb-3">
-              <HintPanel
-                key={levelDefinition.id}
-                hints={levelDefinition.hints}
-                failedRuns={failedRuns}
-                onHintUsed={() => recordHint(levelDefinition.id)}
-              />
+    <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
+      <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
+        <AppShell
+          debugOpen={debugPanelOpen}
+          worldView={
+            <WorldView
+              worldState={worldState}
+              activeLine={currentLine ?? undefined}
+            />
+          }
+          missionPanel={
+            <div className="flex flex-col gap-3">
+              <MissionPanel level={levelDefinition} conditionResults={conditionResults} />
+              <div className="px-3 pb-3">
+                <HintPanel
+                  key={levelDefinition.id}
+                  hints={levelDefinition.hints}
+                  failedRuns={failedRuns}
+                  onHintUsed={() => recordHint(levelDefinition.id)}
+                />
+              </div>
             </div>
-          </div>
-        }
-        editor={
-          <CodeEditor
-            code={code}
-            onChange={setCode}
-            currentLine={currentLine ?? undefined}
-            errors={
-              latestError?.highlightLine
-                ? [{ line: latestError.highlightLine, message: latestError.headline }]
-                : undefined
-            }
-          />
-        }
-        toolbar={
-          <Toolbar
-            status={status}
-            speed={speed}
-            onRun={run}
-            onStep={step}
-            onStop={stop}
-            onReset={handleReset}
-            onSpeedChange={setSpeed}
-            onToggleDebug={() => togglePanel('debug')}
-            debugOpen={debugPanelOpen}
-          />
-        }
-        debugPanel={
-          <DebugPanel
-            traceEntries={traceEntries}
-            variables={variables}
-            actions={actionQueue}
-            error={latestError}
-          />
-        }
-      />
-
-      {showOverlay && validationResult && (
-        <SuccessOverlay
-          result={validationResult}
-          hasNextLevel={!!nextLevelId}
-          onNextLevel={nextLevelId ? () => navigate(`/play/${nextLevelId}`) : undefined}
-          onReplay={() => {
-            setOverlayDismissed(true)
-            handleReset()
-          }}
-          onClose={() => setOverlayDismissed(true)}
+          }
+          editor={
+            <CodeEditor
+              code={code}
+              onChange={setCode}
+              currentLine={currentLine ?? undefined}
+              errors={
+                latestError?.highlightLine
+                  ? [{ line: latestError.highlightLine, message: latestError.headline }]
+                  : undefined
+              }
+            />
+          }
+          toolbar={
+            <Toolbar
+              status={status}
+              speed={speed}
+              onRun={run}
+              onStep={step}
+              onStop={stop}
+              onReset={handleReset}
+              onSpeedChange={setSpeed}
+              onToggleDebug={() => togglePanel('debug')}
+              debugOpen={debugPanelOpen}
+              onToggleChat={() => togglePanel('chat')}
+              chatOpen={chatPanelOpen}
+            />
+          }
+          debugPanel={
+            <DebugPanel
+              traceEntries={traceEntries}
+              variables={variables}
+              actions={actionQueue}
+              error={latestError}
+            />
+          }
         />
+
+        {showOverlay && validationResult && (
+          <SuccessOverlay
+            result={validationResult}
+            hasNextLevel={!!nextLevelId}
+            onNextLevel={nextLevelId ? () => navigate(`/play/${nextLevelId}`) : undefined}
+            onReplay={() => {
+              setOverlayDismissed(true)
+              handleReset()
+            }}
+            onClose={() => setOverlayDismissed(true)}
+          />
+        )}
+      </div>
+      {chatPanelOpen && (
+        <ChatPanel onClose={() => togglePanel('chat')} />
       )}
     </div>
   )
