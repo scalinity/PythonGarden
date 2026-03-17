@@ -16,6 +16,7 @@ const API_OBJECTS = [
 
 export function translateNameError(
   error: string,
+  _code = '',
 ): FriendlyError | null {
   const match = error.match(NAME_RE)
   if (!match) return null

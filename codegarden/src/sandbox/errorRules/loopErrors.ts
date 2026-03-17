@@ -2,7 +2,7 @@ import type { FriendlyError } from '@/types/execution.ts'
 
 export function translateLoopError(
   error: string,
-  code: string,
+  code = '',
 ): FriendlyError | null {
   if (!error.includes('InstructionBudgetExceeded')) return null
 

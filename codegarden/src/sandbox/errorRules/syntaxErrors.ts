@@ -9,7 +9,7 @@ const ASSIGN_VS_COMPARE_RE = /SyntaxError:.*invalid syntax/i
 
 export function translateSyntaxError(
   error: string,
-  code: string,
+  code = '',
 ): FriendlyError | null {
   if (!(/SyntaxError|IndentationError/.test(error))) return null
 
