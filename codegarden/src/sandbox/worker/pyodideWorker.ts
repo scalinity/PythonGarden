@@ -32,11 +32,8 @@ function post(msg: WorkerOutMessage): void {
 // ---------------------------------------------------------------------------
 async function handleInit(): Promise<void> {
   try {
-    // @ts-expect-error -- dynamic import from public assets at runtime
-    const mod = await import(/* @vite-ignore */ '/assets/pyodide/pyodide.mjs') as {
-      loadPyodide: (opts?: Record<string, unknown>) => Promise<PyodideInterface>
-    }
-    pyodide = await mod.loadPyodide({
+    const { loadPyodide } = await import('pyodide');
+    pyodide = await loadPyodide({
       indexURL: '/assets/pyodide/',
     })
     post({ type: 'ready' })

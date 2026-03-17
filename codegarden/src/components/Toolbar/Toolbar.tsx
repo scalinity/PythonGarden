@@ -60,7 +60,7 @@ export function Toolbar({
         disabled={isRunning}
         aria-label="Run code"
         title="Run code"
-        className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
+        className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-30"
         style={{
           background: 'var(--color-success)',
           color: 'var(--color-bg-primary)',
@@ -75,7 +75,7 @@ export function Toolbar({
         disabled={status !== 'step_paused'}
         aria-label="Step through code one action at a time"
         title="Step"
-        className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
+        className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-30"
         style={{
           background: 'var(--color-accent)',
           color: 'var(--color-bg-primary)',
@@ -90,7 +90,7 @@ export function Toolbar({
         disabled={isIdle}
         aria-label="Stop execution"
         title="Stop"
-        className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-40"
+        className="rounded px-3 py-1 text-xs font-bold transition-opacity disabled:opacity-30"
         style={{
           background: 'var(--color-error)',
           color: 'var(--color-bg-primary)',

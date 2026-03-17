@@ -3,8 +3,8 @@ import { useGameStore } from '@store/useGameStore.ts'
 import { levels } from '@data/levels/index.ts'
 
 const BIOME_COLORS: Record<string, string> = {
-  silent_greenhouse: '#22d3ee',
-  thirst_fields: '#fbbf24',
+  silent_greenhouse: '#f59e0b',
+  thirst_fields: '#fb923c',
   pollinator_ridge: '#34d399',
   root_network: '#a78bfa',
   archive_canopy: '#f472b6',
@@ -54,7 +54,7 @@ export function LevelSelect() {
               key={level.id}
               disabled={!unlocked}
               onClick={() => navigate(`/play/${level.id}`)}
-              className="rounded-lg p-4 text-left transition-all disabled:cursor-not-allowed disabled:opacity-40"
+              className="rounded p-5 text-left transition-all disabled:cursor-not-allowed disabled:opacity-40"
               style={{
                 background: 'var(--color-bg-panel)',
                 border: next
@@ -62,7 +62,6 @@ export function LevelSelect() {
                   : completed
                     ? '1px solid var(--color-success)'
                     : '1px solid var(--color-border)',
-                boxShadow: next ? '0 0 12px var(--color-glow)' : 'none',
               }}
             >
               <div className="mb-1 flex items-center justify-between">
@@ -94,8 +93,9 @@ export function LevelSelect() {
                     key={c}
                     className="rounded px-1.5 py-0.5 text-xs"
                     style={{
-                      background: 'var(--color-bg-secondary)',
+                      background: 'transparent',
                       color: 'var(--color-text-secondary)',
+                      border: '1px solid var(--color-border)',
                     }}
                   >
                     {c}

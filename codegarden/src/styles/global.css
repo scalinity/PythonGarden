@@ -2,22 +2,27 @@
 
 :root {
   --font-size-base: 16px;
-  --color-bg-primary: #0a0e17;
-  --color-bg-secondary: #111827;
-  --color-bg-panel: #1a2332;
-  --color-border: #2d3a4d;
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #94a3b8;
-  --color-accent: #22d3ee;
-  --color-accent-on-panel: #5eead4;
-  --color-accent-dim: #0e7490;
+  --color-bg-primary: #0c0c0c;
+  --color-bg-secondary: #161616;
+  --color-bg-panel: #1c1c1c;
+  --color-border: #2a2a2a;
+  --color-text-primary: #e0e0e0;
+  --color-text-secondary: #8a8a8a;
+  --color-accent: #f59e0b;
+  --color-accent-on-panel: #fbbf24;
+  --color-accent-dim: #b45309;
   --color-success: #34d399;
-  --color-warning: #fbbf24;
-  --color-error: #f87171;
+  --color-warning: #f97316;
+  --color-error: #ef4444;
   --color-moisture: #38bdf8;
   --color-health-good: #4ade80;
   --color-health-bad: #ef4444;
-  --color-glow: rgba(34, 211, 238, 0.4);
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
 }
 
 html {
@@ -29,7 +34,7 @@ body {
   padding: 0;
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-display);
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -43,16 +48,20 @@ body {
 /* High contrast theme */
 .theme-high-contrast {
   --color-bg-primary: #000000;
-  --color-bg-secondary: #1a1a1a;
-  --color-bg-panel: #262626;
+  --color-bg-secondary: #141414;
+  --color-bg-panel: #1a1a1a;
   --color-border: #525252;
   --color-text-primary: #ffffff;
-  --color-text-secondary: #d4d4d4;
-  --color-accent: #67e8f9;
-  --color-accent-on-panel: #a5f3fc;
+  --color-text-secondary: #a3a3a3;
+  --color-accent: #fbbf24;
+  --color-accent-on-panel: #fde68a;
+  --color-accent-dim: #d97706;
   --color-success: #6ee7b7;
-  --color-warning: #fde68a;
+  --color-warning: #fdba74;
   --color-error: #fca5a5;
+  --color-moisture: #7dd3fc;
+  --color-health-good: #86efac;
+  --color-health-bad: #fca5a5;
 }
 
 /* Dyslexia-friendly font */
@@ -80,3 +89,6 @@ body {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* Monaco line decoration classes */
+.line-highlight-active { background: rgba(245, 158, 11, 0.12) !important; }

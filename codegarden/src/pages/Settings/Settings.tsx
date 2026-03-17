@@ -86,6 +86,7 @@ export function Settings() {
             value={fontSize}
             onChange={(e) => setFontSize(Number(e.target.value))}
             className="w-full"
+            style={{ accentColor: 'var(--color-accent)' }}
           />
         </div>
 

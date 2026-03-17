@@ -1,4 +1,4 @@
-import Editor, { useMonaco, type OnMount } from '@monaco-editor/react'
+import Editor, { type OnMount, type BeforeMount } from '@monaco-editor/react'
 import { useRef, useEffect } from 'react'
 import type { editor } from 'monaco-editor'
 
@@ -19,7 +19,32 @@ export function CodeEditor({
 }: CodeEditorProps) {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const decorationsRef = useRef<editor.IEditorDecorationsCollection | null>(null)
-  const monaco = useMonaco()
+  const monacoRef = useRef<Parameters<BeforeMount>[0] | null>(null)
+
+  // Register custom Monaco theme before editor mounts
+  const handleBeforeMount: BeforeMount = (monaco) => {
+    monacoRef.current = monaco
+    monaco.editor.defineTheme('codegarden-carbon', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        { token: 'keyword', foreground: 'f59e0b', fontStyle: 'bold' },
+        { token: 'string', foreground: '34d399' },
+        { token: 'comment', foreground: '525252', fontStyle: 'italic' },
+        { token: 'number', foreground: 'fb923c' },
+      ],
+      colors: {
+        'editor.background': '#161616',
+        'editor.foreground': '#e0e0e0',
+        'editorCursor.foreground': '#f59e0b',
+        'editorGutter.background': '#0c0c0c',
+        'editorLineNumber.foreground': '#525252',
+        'editorLineNumber.activeForeground': '#f59e0b',
+        'editor.selectionBackground': '#b4530940',
+        'editor.lineHighlightBackground': '#1c1c1c',
+      },
+    })
+  }
 
   const handleMount: OnMount = (editorInstance) => {
     editorRef.current = editorInstance
@@ -45,8 +70,7 @@ export function CodeEditor({
           },
           options: {
             isWholeLine: true,
-            className: 'bg-cyan-900/40',
-            glyphMarginClassName: 'bg-cyan-400',
+            className: 'line-highlight-active',
           },
         },
       ])
@@ -56,6 +80,7 @@ export function CodeEditor({
   // Show error markers
   useEffect(() => {
     const ed = editorRef.current
+    const monaco = monacoRef.current
     if (!ed || !monaco) return
     const model = ed.getModel()
     if (!model) return
@@ -76,20 +101,27 @@ export function CodeEditor({
     } else {
       monaco.editor.setModelMarkers(model, 'codegarden', [])
     }
-  }, [errors, monaco])
+  }, [errors])
 
   return (
     <div className="h-full w-full" role="region" aria-label="Python code editor">
       <Editor
         height="100%"
         language="python"
-        theme="vs-dark"
+        theme="codegarden-carbon"
         value={code}
         onChange={(value) => onChange(value ?? '')}
+        beforeMount={handleBeforeMount}
         onMount={handleMount}
+        loading={<div style={{ background: '#161616', width: '100%', height: '100%' }} />}
         options={{
           fontSize,
+          fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
           minimap: { enabled: false },
+          glyphMargin: false,
+          folding: false,
+          lineNumbersMinChars: 2,
+          lineDecorationsWidth: 10,
           lineNumbers: 'on',
           wordWrap: 'on',
           scrollBeyondLastLine: false,

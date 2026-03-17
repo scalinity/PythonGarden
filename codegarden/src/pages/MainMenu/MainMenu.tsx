@@ -5,20 +5,28 @@ export function MainMenu() {
 
   return (
     <div
-      className="flex h-full flex-col items-center justify-center gap-8"
+      className="flex h-full flex-col items-center justify-center gap-12"
       style={{ background: 'var(--color-bg-primary)' }}
     >
       <div className="text-center">
         <h1
-          className="text-6xl font-black tracking-tight"
+          className="text-5xl tracking-tight"
           style={{
             color: 'var(--color-accent)',
-            textShadow: '0 0 40px var(--color-glow), 0 0 80px var(--color-glow)',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
           }}
         >
           CodeGarden
         </h1>
-        <p className="mt-3 text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+        <p
+          className="mt-3 text-base"
+          style={{
+            color: 'var(--color-text-secondary)',
+            fontWeight: 300,
+            letterSpacing: '0.05em',
+          }}
+        >
           Learn Python by restoring a living world
         </p>
       </div>
@@ -26,7 +34,7 @@ export function MainMenu() {
       <div className="flex flex-col gap-4">
         <button
           onClick={() => navigate('/levels')}
-          className="rounded-lg px-10 py-3 text-lg font-semibold transition-colors"
+          className="rounded px-10 py-3 text-lg font-semibold transition-colors"
           style={{
             background: 'var(--color-accent)',
             color: 'var(--color-bg-primary)',
@@ -36,7 +44,7 @@ export function MainMenu() {
         </button>
         <button
           onClick={() => navigate('/settings')}
-          className="rounded-lg border px-10 py-3 text-lg transition-colors"
+          className="rounded border px-10 py-3 text-lg transition-colors"
           style={{
             borderColor: 'var(--color-border)',
             color: 'var(--color-text-secondary)',
