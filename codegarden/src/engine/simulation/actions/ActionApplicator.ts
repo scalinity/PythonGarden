@@ -22,19 +22,19 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
       }
 
       case 'sprinkler_on': {
-        const sprinkler = draft.sprinklers.find((s) => s.id === action.target)
+        const sprinkler = draft.sprinklers.find((s) => s.id === action.source)
         if (sprinkler) sprinkler.isOn = true
         break
       }
 
       case 'sprinkler_off': {
-        const sprinkler = draft.sprinklers.find((s) => s.id === action.target)
+        const sprinkler = draft.sprinklers.find((s) => s.id === action.source)
         if (sprinkler) sprinkler.isOn = false
         break
       }
 
       case 'spray': {
-        const sprinkler = draft.sprinklers.find((s) => s.id === action.target)
+        const sprinkler = draft.sprinklers.find((s) => s.id === action.source)
         if (sprinkler) {
           for (const plant of draft.plants) {
             if (distance(sprinkler.position, plant.position) <= 2) {
@@ -82,7 +82,9 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
 
       case 'pump_transfer': {
         const pump = draft.pumps.find((p) => p.id === action.source)
-        const reservoir = draft.reservoirs.find((r) => r.id === action.target)
+        const reservoir = action.target
+          ? draft.reservoirs.find((r) => r.id === action.target)
+          : draft.reservoirs[0]
         if (pump && reservoir) {
           reservoir.level = clamp(reservoir.level + pump.transferRate, 0, reservoir.maxLevel)
         }
@@ -90,13 +92,13 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
       }
 
       case 'canopy_open': {
-        const canopy = draft.canopies.find((c) => c.id === action.target)
+        const canopy = draft.canopies.find((c) => c.id === action.source)
         if (canopy) canopy.isOpen = true
         break
       }
 
       case 'canopy_close': {
-        const canopy = draft.canopies.find((c) => c.id === action.target)
+        const canopy = draft.canopies.find((c) => c.id === action.source)
         if (canopy) canopy.isOpen = false
         break
       }
@@ -110,7 +112,7 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
       }
 
       case 'store_item': {
-        const storage = draft.storages.find((s) => s.id === action.target)
+        const storage = draft.storages.find((s) => s.id === action.source)
         if (storage && action.value) {
           storage.items.push(action.value)
         }
@@ -118,9 +120,9 @@ export function applyAction(world: WorldState, action: GameAction): WorldState {
       }
 
       case 'store_in_bin': {
-        const storage = draft.storages.find((s) => s.id === action.target)
-        if (storage && action.value && action.source) {
-          const binName = action.source
+        const storage = draft.storages.find((s) => s.id === action.source)
+        if (storage && action.value && action.target) {
+          const binName = action.target
           if (!storage.bins[binName]) {
             storage.bins[binName] = []
           }

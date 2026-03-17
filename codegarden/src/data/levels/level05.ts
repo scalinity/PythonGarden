@@ -52,13 +52,9 @@ export const level05: LevelDefinition = {
   },
   successConditions: [
     {
-      type: 'state',
-      params: {
-        entity: 'canopy',
-        property: 'isOpen',
-        matchesCondition: 'weather.sunlight <= 60',
-      },
-      description: 'Canopy is in the correct state for the sunlight level',
+      type: 'action',
+      params: { type: 'canopy_close' },
+      description: 'Canopy was closed (sunlight is high)',
     },
   ],
   hints: {

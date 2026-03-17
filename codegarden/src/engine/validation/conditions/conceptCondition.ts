@@ -14,6 +14,7 @@ const conceptPatterns: Record<string, RegExp> = {
   function_def: /def\s+\w+\s*\(/,
   variable_assignment: /\w+\s*=\s*[^=]/,
   dictionary: /\{[^}]*:[^}]*\}/,
+  dictionary_usage: /\{[^}]*:[^}]*\}/,
 }
 
 export function checkConceptCondition(

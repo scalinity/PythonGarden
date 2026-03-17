@@ -1,9 +1,11 @@
 import type { GameAction, ActionType } from '@/types/actions.ts'
 
 interface ActionConditionParams {
-  actionType: ActionType
+  actionType?: ActionType
+  type?: ActionType
   target?: string
   source?: string
+  amount?: number
   exists?: boolean
   count?: number
   countOperator?: '==' | '>=' | '<='
@@ -19,10 +21,12 @@ export function checkActionCondition(
   actions: GameAction[],
   description: string,
 ): ConditionResult {
+  const actionType = params.actionType ?? params.type
   const matching = actions.filter((a) => {
-    if (a.type !== params.actionType) return false
+    if (actionType && a.type !== actionType) return false
     if (params.target && a.target !== params.target) return false
     if (params.source && a.source !== params.source) return false
+    if (params.amount !== undefined && a.amount !== params.amount) return false
     return true
   })
 

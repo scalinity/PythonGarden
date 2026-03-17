@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand'
 import type { ExecutionStatus, ExecutionSpeed, TraceEntry, VariableSnapshot, FriendlyError } from '@/types/execution.ts'
 import type { GameAction } from '@/types/actions.ts'
+import type { ValidationResult } from '@engine/validation/Validator.ts'
 import type { GameStore } from '../useGameStore.ts'
 
 export interface ExecutionSlice {
@@ -12,6 +13,7 @@ export interface ExecutionSlice {
   variables: VariableSnapshot[]
   errors: FriendlyError[]
   logs: string[]
+  validationResult: ValidationResult | null
   setStatus: (status: ExecutionStatus) => void
   setSpeed: (speed: ExecutionSpeed) => void
   setCurrentLine: (line: number | null) => void
@@ -20,6 +22,7 @@ export interface ExecutionSlice {
   setVariables: (vars: VariableSnapshot[]) => void
   addError: (error: FriendlyError) => void
   addLog: (message: string) => void
+  setValidationResult: (result: ValidationResult | null) => void
   clearExecution: () => void
 }
 
@@ -37,6 +40,7 @@ export const createExecutionSlice: StateCreator<
   variables: [],
   errors: [],
   logs: [],
+  validationResult: null,
 
   setStatus: (status) =>
     set((state) => {
@@ -78,6 +82,11 @@ export const createExecutionSlice: StateCreator<
       state.logs.push(message)
     }),
 
+  setValidationResult: (result) =>
+    set((state) => {
+      state.validationResult = result
+    }),
+
   clearExecution: () =>
     set((state) => {
       state.status = 'idle'
@@ -87,5 +96,6 @@ export const createExecutionSlice: StateCreator<
       state.variables = []
       state.errors = []
       state.logs = []
+      state.validationResult = null
     }),
 })

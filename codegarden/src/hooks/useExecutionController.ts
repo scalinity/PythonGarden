@@ -4,6 +4,7 @@ import { PyodideManager } from '@sandbox/PyodideManager.ts'
 import { SimulationEngine } from '@engine/simulation/SimulationEngine.ts'
 import { ExecutionController } from '@engine/runtime/ExecutionController.ts'
 import { buildGameObjectDescriptors } from '@sandbox/SafeGlobalsBuilder.ts'
+import { scanCode } from '@sandbox/codeScan.ts'
 import { validate } from '@engine/validation/Validator.ts'
 import { getNextLevel } from '@engine/levels/LevelManager.ts'
 import type { ExecutionResult } from '@/types/execution.ts'
@@ -30,6 +31,7 @@ export function useExecutionController() {
   const updateWorldState = useGameStore((s) => s.updateWorldState)
   const completeLevel = useGameStore((s) => s.completeLevel)
   const saveCode = useGameStore((s) => s.saveCode)
+  const setValidationResult = useGameStore((s) => s.setValidationResult)
 
   // Initialize Pyodide + Simulation on mount
   useEffect(() => {
@@ -75,6 +77,19 @@ export function useExecutionController() {
     if (!pyodide.current || !simulation.current || !levelDefinition || !worldState) return
     if (!ready.current) return
 
+    // Pre-execution security scan
+    const scan = scanCode(code)
+    if (!scan.safe) {
+      addError({
+        headline: 'Blocked code',
+        explanation: scan.violations.join('\n'),
+        suggestedAction: 'Remove the blocked constructs and try again.',
+        rawError: scan.violations.join('; '),
+      })
+      setStatus('error')
+      return
+    }
+
     clearExecution()
     simulation.current.loadLevel(levelDefinition)
 
@@ -110,6 +125,7 @@ export function useExecutionController() {
 
           if (!result.error) {
             const validation = validate(levelDefinition, finalWorld, result.actions, code)
+            setValidationResult(validation)
             if (validation.passed) {
               const next = getNextLevel(levelDefinition.id)
               completeLevel(levelDefinition.id, next)
@@ -135,7 +151,7 @@ export function useExecutionController() {
   }, [
     levelDefinition, worldState, code, speed,
     clearExecution, setStatus, updateWorldState, addError,
-    setVariables, completeLevel, saveCode,
+    setVariables, completeLevel, saveCode, setValidationResult,
   ])
 
   const stop = useCallback(() => {

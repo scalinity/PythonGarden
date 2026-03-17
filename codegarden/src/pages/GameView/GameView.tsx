@@ -12,7 +12,6 @@ import { SuccessOverlay } from '@components/SuccessOverlay/SuccessOverlay.tsx'
 import { useLevelLoader } from '@hooks/useLevelLoader.ts'
 import { useExecutionController } from '@hooks/useExecutionController.ts'
 import { useAccessibility } from '@hooks/useAccessibility.ts'
-import { validate, type ValidationResult } from '@engine/validation/Validator.ts'
 import { getNextLevel } from '@engine/levels/LevelManager.ts'
 
 export function GameView() {
@@ -42,41 +41,28 @@ export function GameView() {
   const resetCode = useGameStore((s) => s.resetCode)
   const resetWorld = useGameStore((s) => s.resetWorld)
   const clearExecution = useGameStore((s) => s.clearExecution)
+  const validationResult = useGameStore((s) => s.validationResult)
 
   const latestError = errors.length > 0 ? errors[errors.length - 1] : undefined
   const failedRuns = levelDefinition ? (hintsUsed[levelDefinition.id] ?? 0) : 0
 
-  interface OverlayState {
-    visible: boolean
-    result: ValidationResult | null
-  }
-  const [overlay, setOverlay] = useState<OverlayState>({ visible: false, result: null })
-  const [prevStatus, setPrevStatus] = useState(status)
-
-  // Detect execution finish and validate
-  if (status !== prevStatus) {
-    setPrevStatus(status)
-    const wasRunning = prevStatus === 'running' || prevStatus === 'stepping'
-    if (status === 'reviewing' && wasRunning && levelDefinition && worldState) {
-      const result = validate(levelDefinition, worldState, actionQueue, code)
-      setOverlay({ visible: true, result })
-    }
-  }
+  const [overlayDismissed, setOverlayDismissed] = useState(false)
+  const showOverlay = validationResult !== null && !overlayDismissed
 
   const nextLevelId = levelDefinition ? getNextLevel(levelDefinition.id) : undefined
 
   const conditionResults = useMemo(() => {
-    if (!overlay.result) return undefined
+    if (!validationResult) return undefined
     const map: Record<number, boolean> = {}
-    overlay.result.results.forEach((r, i) => { map[i] = r.passed })
+    validationResult.results.forEach((r, i) => { map[i] = r.passed })
     return map
-  }, [overlay.result])
+  }, [validationResult])
 
   const handleReset = () => {
     clearExecution()
     resetWorld()
     resetCode()
-    setOverlay({ visible: false, result: null })
+    setOverlayDismissed(false)
   }
 
   if (!levelDefinition || !worldState) {
@@ -156,16 +142,16 @@ export function GameView() {
         }
       />
 
-      {overlay.visible && overlay.result && (
+      {showOverlay && validationResult && (
         <SuccessOverlay
-          result={overlay.result}
+          result={validationResult}
           hasNextLevel={!!nextLevelId}
           onNextLevel={nextLevelId ? () => navigate(`/play/${nextLevelId}`) : undefined}
           onReplay={() => {
-            setOverlay({ visible: false, result: null })
+            setOverlayDismissed(true)
             handleReset()
           }}
-          onClose={() => setOverlay((o) => ({ ...o, visible: false }))}
+          onClose={() => setOverlayDismissed(true)}
         />
       )}
     </div>

@@ -9,6 +9,7 @@
   --color-text-primary: #e2e8f0;
   --color-text-secondary: #94a3b8;
   --color-accent: #22d3ee;
+  --color-accent-on-panel: #5eead4;
   --color-accent-dim: #0e7490;
   --color-success: #34d399;
   --color-warning: #fbbf24;
@@ -48,6 +49,7 @@ body {
   --color-text-primary: #ffffff;
   --color-text-secondary: #d4d4d4;
   --color-accent: #67e8f9;
+  --color-accent-on-panel: #a5f3fc;
   --color-success: #6ee7b7;
   --color-warning: #fde68a;
   --color-error: #fca5a5;

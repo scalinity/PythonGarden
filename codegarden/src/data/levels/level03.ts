@@ -9,7 +9,7 @@ export const level03: LevelDefinition = {
   missionText:
     'Label each plant sample by storing its species name in a variable, then filing it in storage.',
   starterCode:
-    '# Store the species names as text\nsample_a = ___\nsample_b = ___\n\n# File them in the storage bins\nstorage.file("bin_a", sample_a)\nstorage.file("bin_b", sample_b)\n',
+    '# Store the species names as text\nsample_a = ___\nsample_b = ___\n\n# File them in the storage bins\nstorage.store_in("bin_a", sample_a)\nstorage.store_in("bin_b", sample_b)\n',
   availableObjects: [
     {
       name: 'plant_a',
@@ -52,8 +52,8 @@ export const level03: LevelDefinition = {
       type: 'Storage',
       methods: [
         {
-          name: 'file',
-          signature: 'storage.file(bin_name, label)',
+          name: 'store_in',
+          signature: 'storage.store_in(bin_name, label)',
           description:
             'Files a label string into the named bin for later reference.',
         },
@@ -87,22 +87,14 @@ export const level03: LevelDefinition = {
   },
   successConditions: [
     {
-      type: 'state',
-      params: {
-        entity: 'storage',
-        property: 'bins.bin_a',
-        contains: 'fern',
-      },
-      description: 'Bin A contains the label "fern"',
+      type: 'action',
+      params: { type: 'store_in_bin', target: 'bin_a' },
+      description: 'Something filed in bin A',
     },
     {
-      type: 'state',
-      params: {
-        entity: 'storage',
-        property: 'bins.bin_b',
-        contains: 'orchid',
-      },
-      description: 'Bin B contains the label "orchid"',
+      type: 'action',
+      params: { type: 'store_in_bin', target: 'bin_b' },
+      description: 'Something filed in bin B',
     },
   ],
   hints: {
@@ -111,7 +103,7 @@ export const level03: LevelDefinition = {
     conceptNudge:
       'Strings are text wrapped in quotes. Try sample_a = "fern".',
     structuralHelp:
-      'sample_a = "fern"\nsample_b = "orchid"\nstorage.file("bin_a", sample_a)\nstorage.file("bin_b", sample_b)',
+      'sample_a = "fern"\nsample_b = "orchid"\nstorage.store_in("bin_a", sample_a)\nstorage.store_in("bin_b", sample_b)',
   },
   conceptCardId: 'strings',
 }
