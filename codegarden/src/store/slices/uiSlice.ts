@@ -9,17 +9,19 @@ export interface UISlice {
   missionPanelOpen: boolean
   debugPanelOpen: boolean
   hintPanelOpen: boolean
+  chatPanelOpen: boolean
   setTheme: (theme: 'default' | 'high-contrast') => void
   setFontSize: (size: number) => void
   setReducedMotion: (on: boolean) => void
   setDyslexiaFont: (on: boolean) => void
-  togglePanel: (panel: 'mission' | 'debug' | 'hint') => void
+  togglePanel: (panel: 'mission' | 'debug' | 'hint' | 'chat') => void
 }
 
 const panelKey = {
   mission: 'missionPanelOpen',
   debug: 'debugPanelOpen',
   hint: 'hintPanelOpen',
+  chat: 'chatPanelOpen',
 } as const
 
 export const createUISlice: StateCreator<
@@ -35,6 +37,7 @@ export const createUISlice: StateCreator<
   missionPanelOpen: true,
   debugPanelOpen: false,
   hintPanelOpen: false,
+  chatPanelOpen: false,
 
   setTheme: (theme) =>
     set((state) => {

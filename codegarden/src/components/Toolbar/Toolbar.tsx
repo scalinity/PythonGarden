@@ -10,6 +10,8 @@ interface ToolbarProps {
   onSpeedChange: (speed: ExecutionSpeed) => void
   onToggleDebug: () => void
   debugOpen: boolean
+  onToggleChat: () => void
+  chatOpen: boolean
 }
 
 const STATUS_LABELS: Record<ExecutionStatus, string> = {
@@ -42,6 +44,8 @@ export function Toolbar({
   onSpeedChange,
   onToggleDebug,
   debugOpen,
+  onToggleChat,
+  chatOpen,
 }: ToolbarProps) {
   const isRunning = status === 'running' || status === 'stepping'
   const isIdle = status === 'idle' || status === 'error'
@@ -155,6 +159,20 @@ export function Toolbar({
         }}
       >
         Debug
+      </button>
+
+      {/* Chat toggle */}
+      <button
+        onClick={onToggleChat}
+        aria-label={chatOpen ? 'Hide AI chat' : 'Show AI chat'}
+        aria-pressed={chatOpen}
+        className="rounded px-2 py-0.5 text-xs transition-colors"
+        style={{
+          background: chatOpen ? 'var(--color-accent-dim)' : 'transparent',
+          color: chatOpen ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+        }}
+      >
+        Chat
       </button>
 
       {/* Status */}
