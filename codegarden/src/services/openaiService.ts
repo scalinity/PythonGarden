@@ -8,9 +8,9 @@ let _client: OpenAI | null = null
 
 function getClient(): OpenAI {
   if (!_client) {
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+    const apiKey = import.meta.env.VITE_OPEN_AI_KEY
     if (!apiKey) {
-      throw new Error('VITE_OPENAI_API_KEY is not set. Add it to .env.local to enable AI chat.')
+      throw new Error('VITE_OPEN_AI_KEY is not set. Add it to .env.local to enable AI chat.')
     }
     _client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true })
   }

@@ -126,7 +126,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   const [closeHover, setCloseHover] = useState(false)
   const [inputFocused, setInputFocused] = useState(false)
 
-  const hasApiKey = Boolean(import.meta.env.VITE_OPENAI_API_KEY)
+  const hasApiKey = Boolean(import.meta.env.VITE_OPEN_AI_KEY)
 
   const handleSend = () => {
     const text = inputValue.trim()
