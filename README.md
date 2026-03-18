@@ -4,7 +4,7 @@ A browser-based educational game that teaches beginner-to-intermediate Python th
 
 > **Programming concepts stick better when code visibly changes a living world.**
 
-![PythonGarden](codegarden/src/assets/hero.png)
+![PythonGarden](codegarden/src/assets/hero.png
 
 ![Game UI](codegarden/src/assets/UI.png)
 
@@ -221,4 +221,4 @@ Level files live in `codegarden/src/data/levels/`. Each is a TypeScript file exp
 
 ## License
 
-This project is not currently licensed for redistribution. All rights reserved.
+This project is licensed under the [MIT License](LICENSE).
