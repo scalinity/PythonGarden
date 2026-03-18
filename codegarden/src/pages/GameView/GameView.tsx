@@ -45,6 +45,7 @@ export function GameView() {
   const resetWorld = useGameStore((s) => s.resetWorld)
   const clearExecution = useGameStore((s) => s.clearExecution)
   const validationResult = useGameStore((s) => s.validationResult)
+  const setValidationResult = useGameStore((s) => s.setValidationResult)
 
   const latestError = errors.length > 0 ? errors[errors.length - 1] : undefined
   const failedRuns = levelDefinition ? (hintsUsed[levelDefinition.id] ?? 0) : 0
