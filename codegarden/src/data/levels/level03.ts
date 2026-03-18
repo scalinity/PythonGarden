@@ -2,108 +2,84 @@ import type { LevelDefinition } from '@/types/level.ts'
 
 export const level03: LevelDefinition = {
   id: 'level-03',
-  title: 'Name the Samples',
+  title: 'Store a Value',
   biome: 'silent_greenhouse',
-  concepts: ['strings', 'variables'],
+  concepts: ['variables', 'numbers'],
   order: 3,
   missionText:
-    'Label each plant sample by storing its species name in a variable, then filing it in storage.',
+    '**Variables** — A variable stores a value so you can use it later. You create one with `=`.\n\nFor example:\n```python\ntickets_left = 100 - 37\nprint(tickets_left)\n```\n\n**Your mission:** The plant has 20 moisture and needs 50. Calculate the missing amount, store it in a variable, then spray that exact amount.',
   starterCode:
-    '# Store the species names as text\nsample_a = ___\nsample_b = ___\n\n# File them in the storage bins\nstorage.store_in("bin_a", sample_a)\nstorage.store_in("bin_b", sample_b)\n',
+    '# How much water does the plant need?\n# It has 20 moisture and needs 50\nwater_needed = ___\n\n# Spray that amount\nsprinkler.spray(water_needed)\n',
   availableObjects: [
     {
-      name: 'plant_a',
-      type: 'Plant',
+      name: 'sprinkler',
+      type: 'Sprinkler',
       methods: [
         {
-          name: 'species',
-          signature: 'plant_a.species',
-          description: 'The species of this plant (string).',
-          returnType: 'string',
-        },
-        {
-          name: 'name',
-          signature: 'plant_a.name',
-          description: 'The name of this plant.',
-          returnType: 'string',
-        },
-      ],
-    },
-    {
-      name: 'plant_b',
-      type: 'Plant',
-      methods: [
-        {
-          name: 'species',
-          signature: 'plant_b.species',
-          description: 'The species of this plant (string).',
-          returnType: 'string',
-        },
-        {
-          name: 'name',
-          signature: 'plant_b.name',
-          description: 'The name of this plant.',
-          returnType: 'string',
-        },
-      ],
-    },
-    {
-      name: 'storage',
-      type: 'Storage',
-      methods: [
-        {
-          name: 'store_in',
-          signature: 'storage.store_in(bin_name, label)',
+          name: 'spray',
+          signature: 'sprinkler.spray(amount)',
           description:
-            'Files a label string into the named bin for later reference.',
+            'Sprays the given amount of water on the plant. The amount must be a number.',
+        },
+        {
+          name: 'on',
+          signature: 'sprinkler.on()',
+          description: 'Turns the sprinkler on.',
+        },
+      ],
+    },
+    {
+      name: 'plant',
+      type: 'Plant',
+      methods: [
+        {
+          name: 'moisture',
+          signature: 'plant.moisture',
+          description: 'The current moisture level of the plant (number).',
+          returnType: 'number',
+        },
+        {
+          name: 'health',
+          signature: 'plant.health',
+          description: 'The current health of the plant.',
+          returnType: 'number',
         },
       ],
     },
   ],
   world: {
+    sprinklers: [{ id: 'sprinkler', position: { x: 3, y: 2 }, isOn: true }],
     plants: [
       {
-        id: 'plant_a',
-        name: 'sample_a',
-        species: 'fern',
-        position: { x: 2, y: 3 },
-        moisture: 50,
-        health: 100,
-        ripe: false,
-        needsPollination: false,
-      },
-      {
-        id: 'plant_b',
-        name: 'sample_b',
-        species: 'orchid',
-        position: { x: 5, y: 3 },
-        moisture: 50,
-        health: 100,
+        id: 'plant',
+        name: 'daisy',
+        species: 'daisy',
+        position: { x: 5, y: 2 },
+        moisture: 20,
+        health: 80,
         ripe: false,
         needsPollination: false,
       },
     ],
-    storages: [{ id: 'storage', items: [], bins: { bin_a: [], bin_b: [] } }],
   },
   successConditions: [
     {
-      type: 'action',
-      params: { type: 'store_in_bin', target: 'bin_a' },
-      description: 'Something filed in bin A',
+      type: 'state',
+      params: { entity: 'plant', property: 'moisture', operator: '>=', value: 50 },
+      description: 'Plant moisture reaches at least 50',
     },
     {
-      type: 'action',
-      params: { type: 'store_in_bin', target: 'bin_b' },
-      description: 'Something filed in bin B',
+      type: 'concept',
+      params: { concept: 'variable_assignment' },
+      description: 'A variable is used to store the water amount',
     },
   ],
   hints: {
     direction:
-      'Look at each plant\'s species and store it as a text value.',
+      'The plant has 20 moisture and needs 50. What number fills that gap?',
     conceptNudge:
-      'Strings are text wrapped in quotes. Try sample_a = "fern".',
-    structuralHelp:
-      'sample_a = "fern"\nsample_b = "orchid"\nstorage.store_in("bin_a", sample_a)\nstorage.store_in("bin_b", sample_b)',
+      'A variable stores a value: `water_needed = 30`. Then you can pass it to spray().',
+    structuralHelp: 'water_needed = 30\nsprinkler.spray(water_needed)',
   },
-  conceptCardId: 'strings',
+  conceptCardId: 'variables',
 }

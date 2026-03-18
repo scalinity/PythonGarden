@@ -2,69 +2,68 @@ import type { LevelDefinition } from '@/types/level.ts'
 
 export const level08: LevelDefinition = {
   id: 'level-08',
-  title: 'Pump Until Full',
-  biome: 'root_network',
-  concepts: ['while_loop'],
+  title: 'Two Paths',
+  biome: 'thirst_fields',
+  concepts: ['if_statement', 'else'],
   order: 8,
   missionText:
-    'The reservoir is running low. Keep pumping water into it until it reaches maximum capacity.',
+    '**If/Else** — Sometimes you need two paths: one for when a condition is True, another for when it\'s False.\n\nFor example:\n```python\nif score >= 50:\n    print("pass")\nelse:\n    print("fail")\n```\n\n**Your mission:** Sunlight is at 90. If it is above 60, close the canopy to protect the plants. Otherwise, open it to let light in.',
   starterCode:
-    '# Pump water until the reservoir is full\nwhile reservoir.level < reservoir.max_level:\n    pump.transfer(reservoir)\n',
+    '# Check the sunlight and act accordingly\nif weather.sunlight > 60:\n    ___\nelse:\n    ___\n',
   availableObjects: [
     {
-      name: 'reservoir',
-      type: 'Reservoir',
+      name: 'weather',
+      type: 'Weather',
       methods: [
         {
-          name: 'level',
-          signature: 'reservoir.level',
-          description: 'The current water level in the reservoir.',
-          returnType: 'number',
-        },
-        {
-          name: 'max_level',
-          signature: 'reservoir.max_level',
-          description: 'The maximum capacity of the reservoir.',
+          name: 'sunlight',
+          signature: 'weather.sunlight',
+          description: 'The current sunlight intensity (0-100). Currently 90.',
           returnType: 'number',
         },
       ],
     },
     {
-      name: 'pump',
-      type: 'Pump',
+      name: 'canopy',
+      type: 'Canopy',
       methods: [
         {
-          name: 'transfer',
-          signature: 'pump.transfer(reservoir)',
-          description:
-            'Pumps water into the reservoir. Adds 10 units per call.',
+          name: 'open',
+          signature: 'canopy.open()',
+          description: 'Opens the canopy to let sunlight through.',
+        },
+        {
+          name: 'close',
+          signature: 'canopy.close()',
+          description: 'Closes the canopy to block sunlight.',
+        },
+        {
+          name: 'isOpen',
+          signature: 'canopy.isOpen',
+          description: 'Whether the canopy is currently open (True/False).',
+          returnType: 'bool',
         },
       ],
     },
   ],
   world: {
-    reservoirs: [{ id: 'reservoir', level: 20, maxLevel: 100 }],
-    pumps: [{ id: 'pump', transferRate: 10 }],
+    canopies: [{ id: 'canopy', isOpen: true }],
+    weather: { sunlight: 90, temperature: 25 },
   },
   successConditions: [
     {
-      type: 'state',
-      params: {
-        entity: 'reservoir',
-        property: 'level',
-        operator: '>=',
-        value: 100,
-      },
-      description: 'Reservoir is full (level >= 100)',
+      type: 'action',
+      params: { type: 'canopy_close' },
+      description: 'Canopy was closed (sunlight is high)',
     },
   ],
   hints: {
     direction:
-      'The pump adds 10 units each time. Keep going until the reservoir is full.',
+      'Sunlight is 90, which is above 60. Which branch should run — the if or the else?',
     conceptNudge:
-      'A while loop repeats as long as a condition is True. "while reservoir.level < 100:" keeps looping until it\'s full.',
+      'Fill in the action for each branch. When sunny: `canopy.close()`. Otherwise: `canopy.open()`.',
     structuralHelp:
-      'while reservoir.level < reservoir.max_level:\n    pump.transfer(reservoir)',
+      'if weather.sunlight > 60:\n    canopy.close()\nelse:\n    canopy.open()',
   },
-  conceptCardId: 'while_loop',
+  conceptCardId: 'if_statement',
 }

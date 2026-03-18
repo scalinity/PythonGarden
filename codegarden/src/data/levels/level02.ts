@@ -2,89 +2,89 @@ import type { LevelDefinition } from '@/types/level.ts'
 
 export const level02: LevelDefinition = {
   id: 'level-02',
-  title: 'Store the Water Value',
+  title: 'Two Commands',
   biome: 'silent_greenhouse',
-  concepts: ['variables', 'numbers'],
+  concepts: ['commands', 'arguments'],
   order: 2,
   missionText:
-    'The plant needs exactly the right amount of water. Store the amount in a variable, then spray it.',
+    '**Arguments** — Some commands need extra information, which you put inside the parentheses.\n\nFor example:\n```python\nrobot.pick_up(box)\nrobot.deliver(box)\n```\nThe argument tells the command *what* to act on.\n\n**Your mission:** A flower needs pollinating. Move the drone to the flower, then pollinate it.',
   starterCode:
-    '# Store how much water is needed\nwater_needed = ___\n\n# Spray that amount\nsprinkler.spray(water_needed)\n',
+    '# Step 1: Move the drone to the flower (replace ___ with the target)\ndrone.move_to(___)\n\n# Step 2: Pollinate the flower (replace ___ with the target)\ndrone.pollinate(___)\n',
   availableObjects: [
     {
-      name: 'sprinkler',
-      type: 'Sprinkler',
+      name: 'drone',
+      type: 'Drone',
       methods: [
         {
-          name: 'spray',
-          signature: 'sprinkler.spray(amount)',
-          description:
-            'Sprays the given amount of water on the plant. The amount must be a number.',
+          name: 'move_to',
+          signature: 'drone.move_to(target)',
+          description: 'Moves the drone to the given target.',
         },
         {
-          name: 'on',
-          signature: 'sprinkler.on()',
-          description: 'Turns the sprinkler on.',
-        },
-        {
-          name: 'off',
-          signature: 'sprinkler.off()',
-          description: 'Turns the sprinkler off.',
+          name: 'pollinate',
+          signature: 'drone.pollinate(plant)',
+          description: 'Pollinates the given plant.',
         },
       ],
     },
     {
-      name: 'plant',
+      name: 'flower',
       type: 'Plant',
       methods: [
         {
-          name: 'moisture',
-          signature: 'plant.moisture',
-          description: 'The current moisture level of the plant (number).',
-          returnType: 'number',
+          name: 'needsPollination',
+          signature: 'flower.needs_pollination',
+          description: 'Whether this plant needs pollination (True/False).',
+          returnType: 'bool',
         },
         {
-          name: 'health',
-          signature: 'plant.health',
-          description: 'The current health of the plant.',
-          returnType: 'number',
+          name: 'name',
+          signature: 'flower.name',
+          description: 'The name of the plant.',
+          returnType: 'string',
         },
       ],
     },
   ],
   world: {
-    sprinklers: [{ id: 'sprinkler', position: { x: 3, y: 2 }, isOn: true }],
+    drones: [
+      {
+        id: 'drone',
+        position: { x: 1, y: 1 },
+        direction: 'south',
+        carrying: null,
+      },
+    ],
     plants: [
       {
-        id: 'plant',
-        name: 'daisy',
-        species: 'daisy',
-        position: { x: 5, y: 2 },
-        moisture: 20,
+        id: 'flower',
+        name: 'sunflower',
+        species: 'sunflower',
+        position: { x: 5, y: 3 },
+        moisture: 50,
         health: 80,
         ripe: false,
-        needsPollination: false,
+        needsPollination: true,
       },
     ],
   },
   successConditions: [
     {
-      type: 'state',
-      params: { entity: 'plant', property: 'moisture', operator: '>=', value: 50 },
-      description: 'Plant moisture reaches at least 50',
+      type: 'action',
+      params: { type: 'drone_pollinate', target: 'flower' },
+      description: 'Flower has been pollinated',
     },
     {
-      type: 'concept',
-      params: { concept: 'variable_assignment' },
-      description: 'A variable is used to store the water amount',
+      type: 'state',
+      params: { entity: 'flower', property: 'needsPollination', value: false },
+      description: 'Flower no longer needs pollination',
     },
   ],
   hints: {
-    direction:
-      'How much water does the plant need? Its moisture is 20 and the target is 50.',
+    direction: 'The drone must reach the flower before it can pollinate. What object is the flower?',
     conceptNudge:
-      'A variable stores a value. Replace ___ with the number of water units needed.',
-    structuralHelp: 'water_needed = 30\nsprinkler.spray(water_needed)',
+      'Put the target object name inside the parentheses: `drone.move_to(flower)`.',
+    structuralHelp: 'drone.move_to(flower)\ndrone.pollinate(flower)',
   },
-  conceptCardId: 'variables',
+  conceptCardId: 'commands',
 }
