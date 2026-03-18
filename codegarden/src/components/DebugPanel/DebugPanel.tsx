@@ -7,9 +7,10 @@ interface DebugPanelProps {
   variables: VariableSnapshot[]
   actions: GameAction[]
   error?: FriendlyError
+  logs?: string[]
 }
 
-type TabId = 'variables' | 'events' | 'errors'
+type TabId = 'variables' | 'events' | 'console' | 'errors'
 
 const ACTION_ICONS: Record<string, string> = {
   water_plant: '\uD83D\uDCA7',
@@ -29,7 +30,7 @@ const ACTION_ICONS: Record<string, string> = {
   highlight: '\u2728',
 }
 
-export function DebugPanel({ traceEntries, variables, actions, error }: DebugPanelProps) {
+export function DebugPanel({ traceEntries, variables, actions, error, logs = [] }: DebugPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('variables')
   const [showRawError, setShowRawError] = useState(false)
 
@@ -41,6 +42,7 @@ export function DebugPanel({ traceEntries, variables, actions, error }: DebugPan
   const tabs: { id: TabId; label: string }[] = [
     { id: 'variables', label: 'Variables' },
     { id: 'events', label: 'Event Log' },
+    { id: 'console', label: 'Console' },
     { id: 'errors', label: 'Errors' },
   ]
 
@@ -74,6 +76,13 @@ export function DebugPanel({ traceEntries, variables, actions, error }: DebugPan
                 className="ml-1 inline-block h-2 w-2 rounded-full"
                 style={{ background: 'var(--color-error)' }}
                 aria-label="Has errors"
+              />
+            )}
+            {tab.id === 'console' && logs.length > 0 && (
+              <span
+                className="ml-1 inline-block h-2 w-2 rounded-full"
+                style={{ background: 'var(--color-accent)' }}
+                aria-label="Has output"
               />
             )}
           </button>
@@ -142,6 +151,27 @@ export function DebugPanel({ traceEntries, variables, actions, error }: DebugPan
             {actions.length === 0 && (
               <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
                 No events yet. Run your code to see the action log.
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'console' && (
+          <div className="space-y-0.5 font-mono text-xs" style={{ color: 'var(--color-text-primary)' }}>
+            {logs.map((line, i) => (
+              <div
+                key={i}
+                className="rounded px-2 py-0.5"
+                style={{ background: 'var(--color-bg-secondary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}
+              >
+                {line}
+              </div>
+            ))}
+            {logs.length === 0 && (
+              <div style={{ color: 'var(--color-text-secondary)' }}>
+                No output yet. Use <span style={{ color: 'var(--color-accent)' }}>print()</span> to see values here.
+                <br /><br />
+                Example: <span style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-code)' }}>print(plant.name)</span>
               </div>
             )}
           </div>

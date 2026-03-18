@@ -46,8 +46,8 @@ export function scanCode(code: string): ScanResult {
       violations.push(`Line ${lineNum}: dunder ("__") access is not allowed`)
     }
 
-    // Block open()
-    if (/\bopen\s*\(/.test(line) && !isInsideString(line)) {
+    // Block open() — but not method calls like canopy.open()
+    if (/(?<!\.)\bopen\s*\(/.test(line) && !isInsideString(line)) {
       violations.push(`Line ${lineNum}: "open()" is not allowed`)
     }
 
