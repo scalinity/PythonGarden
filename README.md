@@ -6,6 +6,8 @@ A browser-based educational game that teaches beginner-to-intermediate Python th
 
 ![PythonGarden](codegarden/src/assets/hero.png)
 
+![Game UI](codegarden/src/assets/UI.png)
+
 ## What It Does
 
 PythonGarden embeds Python fundamentals into a cozy simulation game. Instead of abstract coding drills, players write short programs that produce immediate, visible results in a 3D garden world.
