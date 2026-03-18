@@ -2,13 +2,14 @@ import type { LevelDefinition } from '@/types/level.ts'
 
 export const level01: LevelDefinition = {
   id: 'level-01',
-  title: 'Power the Sprinkler',
+  title: 'First Command',
   biome: 'silent_greenhouse',
-  concepts: ['commands', 'sequencing'],
+  concepts: ['commands'],
   order: 1,
   missionText:
-    'The seedling is thirsty! Turn on the sprinkler, then use it to water the plant.',
-  starterCode: '# Turn on the sprinkler\n# Then water the seedling\n',
+    '**Commands** — In Python, you tell objects what to do by writing their name, a dot, and an action.\n\nFor example:\n```python\noven.preheat()\noven.bake(cake)\n```\nEach line is one command. Python runs them top to bottom.\n\n**Your mission:** The seedling is thirsty. Turn the sprinkler on, then use it to water the seedling.',
+  starterCode:
+    '# Step 1: Turn on the sprinkler\nsprinkler.on()\n\n# Step 2: Water the seedling (replace ___ with the plant name)\nsprinkler.water(___)\n',
   availableObjects: [
     {
       name: 'sprinkler',
@@ -84,9 +85,9 @@ export const level01: LevelDefinition = {
     },
   ],
   hints: {
-    direction: 'Think about what needs to happen first before you can water.',
+    direction: 'The sprinkler is already turned on for you. What object needs to go inside water()?',
     conceptNudge:
-      'Each line of code runs one command. Try writing sprinkler.on() first.',
+      'Commands use the pattern `object.action()`. The plant object is called `plant`.',
     structuralHelp: 'sprinkler.on()\nsprinkler.water(plant)',
   },
   conceptCardId: 'commands',

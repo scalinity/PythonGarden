@@ -9,6 +9,13 @@ const BIOME_COLORS: Record<string, string> = {
   root_network: '#a78bfa',
   archive_canopy: '#f472b6',
   memory_marsh: '#818cf8',
+  crystal_summit: '#e0e7ff',
+  shifting_delta: '#22d3ee',
+  ember_terraces: '#ef4444',
+  echo_ravine: '#8b5cf6',
+  tide_pools: '#06b6d4',
+  aurora_steppe: '#10b981',
+  genesis_crater: '#fbbf24',
 }
 
 export function LevelSelect() {

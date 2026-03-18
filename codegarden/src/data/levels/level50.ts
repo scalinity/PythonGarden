@@ -1,0 +1,351 @@
+import type { LevelDefinition } from '@/types/level.ts'
+
+export const level50: LevelDefinition = {
+  id: 'level-50',
+  title: 'Genesis Protocol',
+  biome: 'genesis_crater',
+  concepts: ['elif', 'functions', 'nested_loops', 'break_continue', 'dictionaries', 'f_strings', 'while_loop'],
+  order: 50,
+  missionText:
+    'Execute the Genesis Protocol. Restore the crater ecosystem using everything you have learned.\n\nAnalyze weather conditions, triage every plant across four greenhouse rows, process the entire grid, and file a summary report.',
+  starterCode:
+    '# === Genesis Protocol ===\n# Restore the crater ecosystem. You have all the tools.\n#\n# Goals:\n# - Close canopy if sunlight is high (> 70)\n# - Define a diagnose function for plant triage\n# - Process all plants across rows A-D\n# - Skip dormant plants, water dry ones, feed all\n# - Harvest anything ripe\n# - Fill reservoir to at least half capacity\n# - Store a summary report\n#\n# Species feed amounts: fern=10, orchid=25, moss=5,\n#   vine=12, herb=8, tomato=15\n\n',
+  availableObjects: [
+    {
+      name: 'greenhouse',
+      type: 'Greenhouse',
+      methods: [
+        {
+          name: 'row',
+          signature: 'greenhouse.row("A")',
+          description: 'Returns the list of plants in the named row.',
+        },
+      ],
+    },
+    {
+      name: 'weather',
+      type: 'Weather',
+      methods: [
+        {
+          name: 'sunlight',
+          signature: 'weather.sunlight',
+          description: 'The current sunlight intensity (0-100). Currently 85.',
+          returnType: 'number',
+        },
+        {
+          name: 'temperature',
+          signature: 'weather.temperature',
+          description: 'The current temperature. Currently 30.',
+          returnType: 'number',
+        },
+      ],
+    },
+    {
+      name: 'canopy',
+      type: 'Canopy',
+      methods: [
+        {
+          name: 'open',
+          signature: 'canopy.open()',
+          description: 'Opens the canopy to let sunlight through.',
+        },
+        {
+          name: 'close',
+          signature: 'canopy.close()',
+          description: 'Closes the canopy to block sunlight.',
+        },
+        {
+          name: 'isOpen',
+          signature: 'canopy.isOpen',
+          description: 'Whether the canopy is currently open (True/False).',
+          returnType: 'bool',
+        },
+      ],
+    },
+    {
+      name: 'sprinkler',
+      type: 'Sprinkler',
+      methods: [
+        {
+          name: 'water',
+          signature: 'sprinkler.water(plant)',
+          description: 'Waters the given plant, adding 20 moisture.',
+        },
+      ],
+    },
+    {
+      name: 'sprayer',
+      type: 'Sprayer',
+      methods: [
+        {
+          name: 'feed',
+          signature: 'sprayer.feed(plant, amount)',
+          description: 'Feeds the plant with the given nutrient amount.',
+        },
+      ],
+    },
+    {
+      name: 'drone',
+      type: 'Drone',
+      methods: [
+        {
+          name: 'harvest',
+          signature: 'drone.harvest(plant)',
+          description: 'Harvests the given plant.',
+        },
+      ],
+    },
+    {
+      name: 'reservoir',
+      type: 'Reservoir',
+      methods: [
+        {
+          name: 'level',
+          signature: 'reservoir.level',
+          description: 'The current water level. Currently 10.',
+          returnType: 'number',
+        },
+        {
+          name: 'max_level',
+          signature: 'reservoir.max_level',
+          description: 'The maximum capacity (100).',
+          returnType: 'number',
+        },
+      ],
+    },
+    {
+      name: 'pump',
+      type: 'Pump',
+      methods: [
+        {
+          name: 'transfer',
+          signature: 'pump.transfer(reservoir)',
+          description: 'Pumps 10 units of water into the reservoir.',
+        },
+      ],
+    },
+    {
+      name: 'storage',
+      type: 'Storage',
+      methods: [
+        {
+          name: 'store',
+          signature: 'storage.store(item)',
+          description: 'Stores an item (string or plant) in general storage.',
+        },
+        {
+          name: 'store_in',
+          signature: 'storage.store_in(bin_name, label)',
+          description: 'Files a label string into the named bin.',
+        },
+      ],
+    },
+  ],
+  world: {
+    plants: [
+      {
+        id: 'plant_a1',
+        name: 'row_a_fern',
+        species: 'fern',
+        position: { x: 1, y: 2 },
+        moisture: 10,
+        health: 40,
+        ripe: false,
+        needsPollination: false,
+        row: 'A',
+      },
+      {
+        id: 'plant_a2',
+        name: 'row_a_orchid',
+        species: 'orchid',
+        position: { x: 3, y: 2 },
+        moisture: 55,
+        health: 80,
+        ripe: true,
+        needsPollination: false,
+        row: 'A',
+      },
+      {
+        id: 'plant_a3',
+        name: 'row_a_moss',
+        species: 'moss',
+        position: { x: 5, y: 2 },
+        moisture: 30,
+        health: 0,
+        ripe: false,
+        needsPollination: false,
+        row: 'A',
+      },
+      {
+        id: 'plant_b1',
+        name: 'row_b_vine',
+        species: 'vine',
+        position: { x: 1, y: 3 },
+        moisture: 5,
+        health: 60,
+        ripe: false,
+        needsPollination: false,
+        row: 'B',
+      },
+      {
+        id: 'plant_b2',
+        name: 'row_b_herb',
+        species: 'herb',
+        position: { x: 3, y: 3 },
+        moisture: 45,
+        health: 90,
+        ripe: true,
+        needsPollination: false,
+        row: 'B',
+      },
+      {
+        id: 'plant_b3',
+        name: 'row_b_tomato',
+        species: 'tomato',
+        position: { x: 5, y: 3 },
+        moisture: 20,
+        health: 50,
+        ripe: false,
+        needsPollination: false,
+        row: 'B',
+      },
+      {
+        id: 'plant_c1',
+        name: 'row_c_fern',
+        species: 'fern',
+        position: { x: 1, y: 4 },
+        moisture: 60,
+        health: 70,
+        ripe: false,
+        needsPollination: false,
+        row: 'C',
+      },
+      {
+        id: 'plant_c2',
+        name: 'row_c_orchid',
+        species: 'orchid',
+        position: { x: 3, y: 4 },
+        moisture: 0,
+        health: 0,
+        ripe: false,
+        needsPollination: false,
+        row: 'C',
+      },
+      {
+        id: 'plant_c3',
+        name: 'row_c_vine',
+        species: 'vine',
+        position: { x: 5, y: 4 },
+        moisture: 40,
+        health: 55,
+        ripe: true,
+        needsPollination: false,
+        row: 'C',
+      },
+      {
+        id: 'plant_d1',
+        name: 'row_d_moss',
+        species: 'moss',
+        position: { x: 1, y: 5 },
+        moisture: 15,
+        health: 30,
+        ripe: false,
+        needsPollination: false,
+        row: 'D',
+      },
+      {
+        id: 'plant_d2',
+        name: 'row_d_herb',
+        species: 'herb',
+        position: { x: 3, y: 5 },
+        moisture: 50,
+        health: 85,
+        ripe: false,
+        needsPollination: false,
+        row: 'D',
+      },
+      {
+        id: 'plant_d3',
+        name: 'row_d_tomato',
+        species: 'tomato',
+        position: { x: 5, y: 5 },
+        moisture: 25,
+        health: 65,
+        ripe: true,
+        needsPollination: false,
+        row: 'D',
+      },
+    ],
+    sprinklers: [{ id: 'sprinkler', position: { x: 5, y: 1 }, isOn: true }],
+    sprayers: [{ id: 'sprayer', position: { x: 5, y: 5 } }],
+    drones: [
+      {
+        id: 'drone',
+        position: { x: 5, y: 0 },
+        direction: 'south',
+        carrying: null,
+      },
+    ],
+    reservoirs: [{ id: 'reservoir', level: 10, maxLevel: 100 }],
+    pumps: [{ id: 'pump', transferRate: 10 }],
+    storages: [{ id: 'storage', items: [], bins: { reports: [] } }],
+    weather: { sunlight: 85, temperature: 30 },
+    canopies: [{ id: 'canopy', isOpen: true }],
+  },
+  successConditions: [
+    {
+      type: 'concept',
+      params: { concept: 'function_def' },
+      description: 'A diagnose function is defined',
+    },
+    {
+      type: 'concept',
+      params: { concept: 'elif_statement' },
+      description: 'elif is used for triage logic',
+    },
+    {
+      type: 'concept',
+      params: { concept: 'continue_statement' },
+      description: 'continue is used to skip dormant plants',
+    },
+    {
+      type: 'concept',
+      params: { concept: 'f_string' },
+      description: 'An f-string is used in the report',
+    },
+    {
+      type: 'state',
+      params: {
+        entity: 'canopy',
+        property: 'isOpen',
+        operator: '==',
+        value: false,
+      },
+      description: 'Canopy is closed (sunlight > 70)',
+    },
+    {
+      type: 'state',
+      params: {
+        entity: 'reservoir',
+        property: 'level',
+        operator: '>=',
+        value: 50,
+      },
+      description: 'Reservoir is at least half full (level >= 50)',
+    },
+    {
+      type: 'action',
+      params: { type: 'store_in_bin', target: 'reports' },
+      description: 'A summary report was filed',
+    },
+  ],
+  hints: {
+    direction:
+      'Start with the weather check. Then build your nutrient dictionary. Then define diagnose. Then nested loops for the rows.',
+    conceptNudge:
+      'diagnose should return status and water amount. Use elif for different moisture ranges. Use continue to skip health==0 plants.',
+    structuralHelp:
+      'if weather.sunlight > 70:\n    canopy.close()\n\nnutrients = {"fern": 10, "orchid": 25, "moss": 5,\n             "vine": 12, "herb": 8, "tomato": 15}\n\ndef diagnose(plant):\n    if plant.moisture < 15:\n        return "critical"\n    elif plant.moisture < 30:\n        return "dry"\n    else:\n        return "ok"\n\nrows = ["A", "B", "C", "D"]\ntreated = 0\nfor row_name in rows:\n    row = greenhouse.row(row_name)\n    for plant in row:\n        if plant.health == 0:\n            continue\n        status = diagnose(plant)\n        if status == "critical" or status == "dry":\n            sprinkler.water(plant)\n        sprayer.feed(plant, nutrients[plant.species])\n        if plant.ripe:\n            drone.harvest(plant)\n        treated = treated + 1\n\nwhile reservoir.level < 50:\n    pump.transfer(reservoir)\n\nstorage.store_in("reports", f"Treated {treated} plants")',
+  },
+  conceptCardId: 'functions',
+}
