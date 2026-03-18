@@ -142,15 +142,24 @@ class _SprinklerStub:
 
     def on(self):
         _enqueue('sprinkler_on', source=self._id, _line=_current_line())
+        self._props['isOn'] = True
 
     def off(self):
         _enqueue('sprinkler_off', source=self._id, _line=_current_line())
+        self._props['isOn'] = False
 
     def water(self, plant):
+        if not self._props.get('isOn', False):
+            return
         target = plant._id if hasattr(plant, '_id') else str(plant)
         _enqueue('water_plant', source=self._id, target=target, _line=_current_line())
+        # Mirror state change so while-loop conditions terminate correctly
+        if hasattr(plant, '_props'):
+            plant._props['moisture'] = min(plant._props.get('moisture', 0) + 20, 100)
 
     def spray(self, amount=1):
+        if not self._props.get('isOn', False):
+            return
         _enqueue('spray', source=self._id, amount=amount, _line=_current_line())
 
     def __repr__(self):
@@ -282,6 +291,11 @@ class _PumpStub:
     def transfer(self, target=None):
         t = target._id if target is not None and hasattr(target, '_id') else None
         _enqueue('pump_transfer', source=self._id, target=t, _line=_current_line())
+        # Mirror state change so while-loop conditions terminate correctly
+        if target is not None and hasattr(target, '_props'):
+            rate = self._props.get('transferRate', 10)
+            max_lv = target._props.get('maxLevel', 100)
+            target._props['level'] = min(target._props.get('level', 0) + rate, max_lv)
 
     def __repr__(self):
         return f"Pump({self._id!r})"

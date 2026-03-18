@@ -7,8 +7,8 @@ export function createSprinkler(sprinkler: Sprinkler): THREE.Group {
   group.userData = { entityId: sprinkler.id, entityType: 'sprinklers' }
 
   const isOn = sprinkler.isOn
-  const baseColor = isOn ? 0x38bdf8 : 0x2a2a2a
-  const emissiveIntensity = isOn ? 0.7 : 0.05
+  const baseColor = isOn ? 0x38bdf8 : 0x444444
+  const emissiveIntensity = isOn ? 0.7 : 0.1
 
   // Base box
   const baseGeo = new THREE.BoxGeometry(0.5, 0.3, 0.5)

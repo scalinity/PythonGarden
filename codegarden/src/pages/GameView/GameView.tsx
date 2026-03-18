@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { useGameStore } from '@store/useGameStore.ts'
 import { AppShell } from '@components/AppShell/AppShell.tsx'
@@ -35,6 +35,7 @@ export function GameView() {
   const traceEntries = useGameStore((s) => s.traceEntries)
   const variables = useGameStore((s) => s.variables)
   const errors = useGameStore((s) => s.errors)
+  const logs = useGameStore((s) => s.logs)
   const debugPanelOpen = useGameStore((s) => s.debugPanelOpen)
   const chatPanelOpen = useGameStore((s) => s.chatPanelOpen)
   const togglePanel = useGameStore((s) => s.togglePanel)
@@ -48,8 +49,7 @@ export function GameView() {
   const latestError = errors.length > 0 ? errors[errors.length - 1] : undefined
   const failedRuns = levelDefinition ? (hintsUsed[levelDefinition.id] ?? 0) : 0
 
-  const [overlayDismissed, setOverlayDismissed] = useState(false)
-  const showOverlay = validationResult !== null && !overlayDismissed
+  const showOverlay = validationResult !== null
 
   const nextLevelId = levelDefinition ? getNextLevel(levelDefinition.id) : undefined
 
@@ -64,7 +64,6 @@ export function GameView() {
     clearExecution()
     resetWorld()
     resetCode()
-    setOverlayDismissed(false)
   }
 
   if (!levelDefinition || !worldState) {
@@ -88,6 +87,7 @@ export function GameView() {
   }
 
   return (
+    <>
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
         <AppShell
@@ -144,26 +144,26 @@ export function GameView() {
               variables={variables}
               actions={actionQueue}
               error={latestError}
+              logs={logs}
             />
           }
         />
 
-        {showOverlay && validationResult && (
-          <SuccessOverlay
-            result={validationResult}
-            hasNextLevel={!!nextLevelId}
-            onNextLevel={nextLevelId ? () => navigate(`/play/${nextLevelId}`) : undefined}
-            onReplay={() => {
-              setOverlayDismissed(true)
-              handleReset()
-            }}
-            onClose={() => setOverlayDismissed(true)}
-          />
-        )}
       </div>
       {chatPanelOpen && (
         <ChatPanel onClose={() => togglePanel('chat')} />
       )}
     </div>
+
+    {showOverlay && validationResult && (
+      <SuccessOverlay
+        result={validationResult}
+        hasNextLevel={!!nextLevelId}
+        onNextLevel={nextLevelId ? () => navigate(`/play/${nextLevelId}`) : undefined}
+        onReplay={handleReset}
+        onClose={() => setValidationResult(null)}
+      />
+    )}
+    </>
   )
 }

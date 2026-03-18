@@ -126,6 +126,7 @@ export function useExecutionController() {
           const finalWorld = simulation.current.getWorldState()
           updateWorldState(finalWorld)
           setVariables(result.variables)
+          result.logs.forEach(addLog)
 
           if (!result.error) {
             const validation = validate(levelDefinition, finalWorld, result.actions, executedCode)
@@ -155,7 +156,7 @@ export function useExecutionController() {
   }, [
     levelDefinition, worldState, code, speed,
     clearExecution, setStatus, updateWorldState, addError,
-    setVariables, completeLevel, saveCode, setValidationResult,
+    setVariables, addLog, completeLevel, saveCode, setValidationResult,
   ])
 
   const stop = useCallback(() => {

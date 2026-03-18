@@ -19,13 +19,12 @@ export interface SceneContext {
 }
 
 // Scene bounds in view-space (computed from 10x5 grid projected through the isometric camera)
-// Grid X maps directly to view horizontal; grid Z is compressed by the camera angle.
-// With camera at (5,7,9) looking at (5,0,2.5):
+// With camera at (5, 5.5, 10) looking at (5, 0, 2.5) (~38° angle):
 //   View horizontal span: ~12 units (grid 0-10 + 1 padding each side)
-//   View vertical span:   ~6 units  (grid depth compressed by angle + entity heights)
+//   View vertical span:   ~6 units  (grid depth at shallow angle + entity heights*1.5 scale)
 const SCENE_WIDTH = 12
 const SCENE_HEIGHT = 6
-const PADDING = 1.15 // 15% breathing room
+const PADDING = 1.1
 
 export function createScene(container: HTMLDivElement): SceneContext {
   const w = container.clientWidth || 300
@@ -50,22 +49,22 @@ export function createScene(container: HTMLDivElement): SceneContext {
   labelRenderer.domElement.style.pointerEvents = 'none'
   container.appendChild(labelRenderer.domElement)
 
-  // Orthographic camera — ~47° isometric tilt for visible 3D depth
+  // Orthographic camera — ~38° isometric tilt to show entity sides
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100)
-  camera.position.set(5, 7, 9)
+  camera.position.set(5, 5.5, 10)
   camera.lookAt(5, 0, 2.5)
 
   // Scene
   const scene = new THREE.Scene()
 
-  // Lighting — dim ambient so emissive glow is prominent
-  scene.add(new THREE.AmbientLight(0x1a1a1a, 0.4))
+  // Lighting — bright enough to reveal 3D surface shading
+  scene.add(new THREE.AmbientLight(0x333333, 0.8))
 
-  const directional = new THREE.DirectionalLight(0x8a8a8a, 0.3)
-  directional.position.set(5, 10, 5)
+  const directional = new THREE.DirectionalLight(0xffffff, 0.6)
+  directional.position.set(3, 10, 7)
   scene.add(directional)
 
-  scene.add(new THREE.HemisphereLight(0x0c0c0c, 0xf59e0b, 0.15))
+  scene.add(new THREE.HemisphereLight(0x111111, 0xf59e0b, 0.3))
 
   // Entity group
   const entityGroup = new THREE.Group()
@@ -77,9 +76,9 @@ export function createScene(container: HTMLDivElement): SceneContext {
 
   const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(w, h),
-    0.8,  // strength
-    0.4,  // radius
-    0.85, // threshold
+    0.6,  // strength
+    0.5,  // radius
+    0.4,  // threshold
   )
   composer.addPass(bloomPass)
   composer.addPass(new OutputPass())
@@ -123,6 +122,15 @@ export function createScene(container: HTMLDivElement): SceneContext {
   }
 
   function dispose() {
+    // Dispose all geometries and materials in the scene
+    scene.traverse((obj) => {
+      if (obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments) {
+        obj.geometry.dispose()
+        const mat = obj.material
+        if (Array.isArray(mat)) mat.forEach((m) => m.dispose())
+        else mat.dispose()
+      }
+    })
     composer.dispose()
     renderer.dispose()
     if (renderer.domElement.parentElement) {

@@ -1,3 +1,10 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+dist-ssr
+
 # Logs
 logs
 *.log
@@ -7,25 +14,35 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Environment files
+# Environment & secrets
 .env
 .env.*
-
-# Worktrees
-.worktrees
+*.local
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git worktrees
+.worktrees
+
+# Testing & automation screenshots
+.playwright-mcp/
+
+# AI tooling / session artifacts
+.claude/
+docs/superpowers/
+
+# Electron build output
+electron/dist/
+out/

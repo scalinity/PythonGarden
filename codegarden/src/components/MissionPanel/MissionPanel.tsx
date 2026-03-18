@@ -1,6 +1,6 @@
-import type { LevelDefinition, AvailableObject } from '@/types/level.ts'
-import type { SuccessCondition } from '@/types/level.ts'
+import type { LevelDefinition, AvailableObject, SuccessCondition } from '@/types/level.ts'
 import { concepts } from '@data/concepts/concepts.ts'
+import { highlightPython } from '@/utils/highlightPython.ts'
 
 interface MissionPanelProps {
   level: LevelDefinition
@@ -56,8 +56,33 @@ function ConditionRow({
   )
 }
 
+function renderMissionText(text: string) {
+  const parts = text.split(/(`[^`]+`)/)
+  return parts.map((part, i) => {
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return (
+        <code
+          key={i}
+          className="rounded px-1 py-0.5 text-xs"
+          style={{
+            background: 'var(--color-bg-secondary)',
+            color: 'var(--color-accent)',
+            fontFamily: 'var(--font-code)',
+          }}
+        >
+          {part.slice(1, -1)}
+        </code>
+      )
+    }
+    return <span key={i}>{part}</span>
+  })
+}
+
 export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
   const conceptCard = concepts.find((c) => c.id === level.conceptCardId)
+  if (import.meta.env.DEV && level.conceptCardId && !conceptCard) {
+    console.warn(`MissionPanel: conceptCardId "${level.conceptCardId}" not found in concepts`)
+  }
 
   return (
     <div className="flex h-full flex-col gap-4 p-4" style={{ background: 'var(--color-bg-panel)' }}>
@@ -71,17 +96,7 @@ export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
         </h2>
       </div>
 
-      {/* Mission */}
-      <div>
-        <h3 className="mb-1 text-[11px] font-medium uppercase" style={{ color: 'var(--color-text-secondary)', letterSpacing: '0.1em' }}>
-          Mission
-        </h3>
-        <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
-          {level.missionText}
-        </p>
-      </div>
-
-      {/* Concept card */}
+      {/* Concept card — shown above mission for teach-first approach */}
       {conceptCard && (
         <div
           className="rounded p-2"
@@ -96,8 +111,23 @@ export function MissionPanel({ level, conditionResults }: MissionPanelProps) {
           <p className="mt-1 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
             {conceptCard.explanation}
           </p>
+          <pre
+            className="mt-2 overflow-x-auto rounded p-2 text-xs"
+            style={{ background: 'var(--color-bg-panel)', fontFamily: 'var(--font-code)' }}
+            dangerouslySetInnerHTML={{ __html: highlightPython(conceptCard.pythonExample) }}
+          />
         </div>
       )}
+
+      {/* Mission */}
+      <div>
+        <h3 className="mb-1 text-[11px] font-medium uppercase" style={{ color: 'var(--color-text-secondary)', letterSpacing: '0.1em' }}>
+          Mission
+        </h3>
+        <p className="text-sm" style={{ color: 'var(--color-text-primary)', whiteSpace: 'pre-line' }}>
+          {renderMissionText(level.missionText)}
+        </p>
+      </div>
 
       {/* Available objects */}
       <div>
